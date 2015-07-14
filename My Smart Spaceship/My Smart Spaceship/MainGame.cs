@@ -16,6 +16,7 @@ namespace My_Smart_Spaceship
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Background background;
+        Player player;
         public MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -47,7 +48,7 @@ namespace My_Smart_Spaceship
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
-            
+            player = new Player(Content.Load<Texture2D>("player.png"), new Vector2(500,500));
             // TODO: use this.Content to load your game content here
         }
 
@@ -71,7 +72,7 @@ namespace My_Smart_Spaceship
                 Exit();
             // TODO: Add your update logic here
             background.Update(gameTime);
-
+            player.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -85,6 +86,7 @@ namespace My_Smart_Spaceship
 
             spriteBatch.Begin();
             background.Draw(gameTime,spriteBatch);
+            player.Draw(gameTime,spriteBatch);
             spriteBatch.End();
             // TODO: Add your drawing code here
 
