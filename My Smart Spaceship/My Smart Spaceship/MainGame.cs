@@ -11,15 +11,18 @@ namespace My_Smart_Spaceship
     /// </summary>
     public class MainGame : Game
     {
+        public static int screenHeight = 600;
+        public static int screenWidth = 800;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
+        Background background;
         public MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferHeight = 600;
-            graphics.PreferredBackBufferWidth = 800;
+            graphics.PreferredBackBufferHeight = screenHeight;
+            graphics.PreferredBackBufferWidth = screenWidth;
             Content.RootDirectory = "Content";
+            IsFixedTimeStep = true;
         }
 
         /// <summary>
@@ -43,6 +46,7 @@ namespace My_Smart_Spaceship
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
             
             // TODO: use this.Content to load your game content here
         }
@@ -65,8 +69,8 @@ namespace My_Smart_Spaceship
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
             // TODO: Add your update logic here
+            background.Update(gameTime);
 
             base.Update(gameTime);
         }
@@ -79,6 +83,9 @@ namespace My_Smart_Spaceship
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            spriteBatch.Begin();
+            background.Draw(gameTime,spriteBatch);
+            spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
