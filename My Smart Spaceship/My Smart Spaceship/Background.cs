@@ -71,7 +71,6 @@ namespace My_Smart_Spaceship
                         pos.Y = -sprite.Height;
                 }
                 pos += velocity * delta;
-
                 positions[i] = pos;
 
             }
