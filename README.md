@@ -6,7 +6,7 @@
 
 TODO:
 	# Graficos
-		[ ] Estrellas en movimiento
+		[X] Fondo de estrellas en movimiento
 		[ ] Sprites para las naves, disparos, asteroides, explosiones, etc ...
 		[ ] Sprites para las mejoras (power-ups) como escudos, disparo doble ...
 	
