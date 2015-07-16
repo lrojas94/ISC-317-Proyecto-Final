@@ -11,13 +11,27 @@ namespace My_Smart_Spaceship
     /// </summary>
     public class MainGame : Game
     {
-        public static int screenHeight = 600;
-        public static int screenWidth = 800;
+        public int screenHeight = 600;
+        public int screenWidth = 800;
+        public SpriteSheetHandler spriteSheetHandler;
+
+        private static MainGame instance;
+        public static MainGame Instance
+        {
+            get{
+                if (instance == null)
+                    instance = new MainGame();
+                return instance;
+            }
+
+        }
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Background background;
         Player player;
-        public MainGame()
+        
+        private MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = screenHeight;
@@ -46,9 +60,12 @@ namespace My_Smart_Spaceship
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
+
+            spriteSheetHandler = new SpriteSheetHandler("Content/spriteSheet.sprites");
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
-            player = new Player(Content.Load<Texture2D>("player.png"), new Vector2(500,500));
+            player = new Player(@"Players\playerA_Blue", new Vector2(500,500));
+
             // TODO: use this.Content to load your game content here
         }
 

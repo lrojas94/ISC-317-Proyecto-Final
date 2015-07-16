@@ -43,8 +43,8 @@ namespace My_Smart_Spaceship
 
         private void createSpriteTiles() {
             int posY = -sprite.Height, posX = -sprite.Width;
-            int screenWidth = MainGame.screenWidth;
-            int screenHeight = MainGame.screenHeight;
+            int screenWidth = MainGame.Instance.screenWidth;
+            int screenHeight = MainGame.Instance.screenHeight;
             while (posY < screenHeight)
             {
                 while (posX < screenWidth)
@@ -65,9 +65,9 @@ namespace My_Smart_Spaceship
                 //  Vector2 is a Structure, which means it is passed by VALUE, Not reference.
                 Vector2 pos = positions[i];
                 if (ShouldRepeat) {
-                    if (pos.X > MainGame.screenWidth)
+                    if (pos.X > MainGame.Instance.screenWidth)
                         pos.X = -sprite.Width;
-                    if (pos.Y > MainGame.screenHeight)
+                    if (pos.Y > MainGame.Instance.screenHeight)
                         pos.Y = -sprite.Height;
                 }
                 pos += velocity * delta;

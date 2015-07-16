@@ -14,8 +14,7 @@ namespace My_Smart_Spaceship
         [STAThread]
         static void Main()
         {
-            using (var game = new MainGame())
-                game.Run();
+            MainGame.Instance.Run();
         }
     }
 #endif

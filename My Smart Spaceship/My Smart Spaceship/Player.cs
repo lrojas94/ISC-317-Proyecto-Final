@@ -10,18 +10,23 @@ namespace My_Smart_Spaceship
 {
     class Player
     {
-        Texture2D sprite;
+        string spritePath;
         Vector2 position;
         Vector2 playerSpeed;
+        
        
-        public Player(Texture2D sprite,Vector2 playerSpeed) {
-            this.sprite = sprite;
+        public Player(string spritePath,Vector2 playerSpeed) {
+            this.spritePath = spritePath;
             this.playerSpeed = playerSpeed;
-            position = new Vector2(MainGame.screenWidth / 2 - sprite.Width / 2, MainGame.screenHeight - sprite.Height);
+            Rectangle sprite = MainGame.Instance.spriteSheetHandler.SpriteRectangle(spritePath);
+            position = new Vector2(MainGame.Instance.screenWidth / 2, MainGame.Instance.screenHeight - sprite.Height/2);
         }
 
         public void Update(GameTime gameTime) {
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            Rectangle sprite = MainGame.Instance.spriteSheetHandler.SpriteRectangle(spritePath);
+
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
                 position.X += -1 * playerSpeed.X * delta;
            
@@ -37,18 +42,18 @@ namespace My_Smart_Spaceship
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
                 position.Y += playerSpeed.Y * delta;
 
-            if (position.X < 0)
-                position.X = 0;
-            if (position.X + sprite.Width > MainGame.screenWidth)
-                position.X = MainGame.screenWidth - sprite.Width;
-            if (position.Y < 0)
-                position.Y = 0;
-            if (position.Y + sprite.Height > MainGame.screenHeight)
-                position.Y = MainGame.screenHeight - sprite.Height;
+            if (position.X - sprite.Width/2 < 0)
+                position.X = sprite.Width/2;
+            if (position.X + sprite.Width/2 > MainGame.Instance.screenWidth)
+                position.X = MainGame.Instance.screenWidth - sprite.Width/2;
+            if (position.Y - sprite.Height/2 < 0)
+                position.Y = sprite.Height/2;
+            if (position.Y + sprite.Height/2 > MainGame.Instance.screenHeight)
+                position.Y = MainGame.Instance.screenHeight - sprite.Height/2;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
-            spriteBatch.Draw(sprite, position, Color.White);
+            MainGame.Instance.spriteSheetHandler.DrawSprite(spriteBatch, position, spritePath);
         }
     }
 }
