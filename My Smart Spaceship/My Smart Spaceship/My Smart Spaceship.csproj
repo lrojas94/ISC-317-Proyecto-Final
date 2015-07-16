@@ -42,8 +42,10 @@
   <ItemGroup>
     <Compile Include="Animation.cs" />
     <Compile Include="Background.cs" />
+    <Compile Include="COM.cs" />
     <Compile Include="Bullet.cs" />
     <Compile Include="MainGame.cs" />
+    <Compile Include="Meteors.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

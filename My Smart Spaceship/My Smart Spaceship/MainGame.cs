@@ -2,7 +2,11 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using SbsSW.SwiPlCs;
+
 
 namespace My_Smart_Spaceship
 {
@@ -11,8 +15,8 @@ namespace My_Smart_Spaceship
     /// </summary>
     public class MainGame : Game
     {
-        public int screenHeight = 600;
-        public int screenWidth = 800;
+        public int ScreenHeight = 600;
+        public int ScreenWidth = 800;
         public SpriteSheetHandler spriteSheetHandler;
 
         private static MainGame instance;
@@ -30,12 +34,15 @@ namespace My_Smart_Spaceship
         SpriteBatch spriteBatch;
         Background background;
         Player player;
-        
-        private MainGame()
+        COM com;
+        List<Meteors> meteor = new List<Meteors>();
+
+        Random random = new Random();
+        public MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferHeight = screenHeight;
-            graphics.PreferredBackBufferWidth = screenWidth;
+            graphics.PreferredBackBufferHeight = ScreenHeight;
+            graphics.PreferredBackBufferWidth = ScreenWidth;
             Content.RootDirectory = "Content";
             IsFixedTimeStep = true;
         }
@@ -65,6 +72,7 @@ namespace My_Smart_Spaceship
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
             player = new Player(@"Players\playerA_Blue", new Vector2(500,500));
+            //com = new COM(Content.Load<Texture2D>("com.png"), new Vector2(280, 280));
 
             // TODO: use this.Content to load your game content here
         }

@@ -19,7 +19,7 @@ namespace My_Smart_Spaceship
             this.spritePath = spritePath;
             this.playerSpeed = playerSpeed;
             Rectangle sprite = MainGame.Instance.spriteSheetHandler.SpriteRectangle(spritePath);
-            position = new Vector2(MainGame.Instance.screenWidth / 2, MainGame.Instance.screenHeight - sprite.Height/2);
+            position = new Vector2(MainGame.Instance.ScreenWidth / 2, MainGame.Instance.ScreenHeight - sprite.Height/2);
         }
 
         public void Update(GameTime gameTime) {
@@ -44,12 +44,12 @@ namespace My_Smart_Spaceship
 
             if (position.X - sprite.Width/2 < 0)
                 position.X = sprite.Width/2;
-            if (position.X + sprite.Width/2 > MainGame.Instance.screenWidth)
-                position.X = MainGame.Instance.screenWidth - sprite.Width/2;
+            if (position.X + sprite.Width/2 > MainGame.Instance.ScreenWidth)
+                position.X = MainGame.Instance.ScreenWidth - sprite.Width/2;
             if (position.Y - sprite.Height/2 < 0)
                 position.Y = sprite.Height/2;
-            if (position.Y + sprite.Height/2 > MainGame.Instance.screenHeight)
-                position.Y = MainGame.Instance.screenHeight - sprite.Height/2;
+            if (position.Y + sprite.Height/2 > MainGame.Instance.ScreenHeight)
+                position.Y = MainGame.Instance.ScreenHeight - sprite.Height/2;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
