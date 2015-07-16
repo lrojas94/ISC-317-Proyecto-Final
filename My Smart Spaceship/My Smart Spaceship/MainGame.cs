@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using SbsSW.SwiPlCs;
+using System.Collections.Generic;
 
 namespace My_Smart_Spaceship
 {
@@ -18,6 +19,8 @@ namespace My_Smart_Spaceship
         Background background;
         Player player;
         COM com;
+        List<Meteors> meteor = new List<Meteors>();
+        Random random = new Random();
         public MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -44,6 +47,9 @@ namespace My_Smart_Spaceship
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
+        /// 
+
+        float spawn = 0;
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
@@ -53,6 +59,8 @@ namespace My_Smart_Spaceship
             com = new COM(Content.Load<Texture2D>("com.png"), new Vector2(140, 140));
             // TODO: use this.Content to load your game content here
         }
+
+         
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
@@ -76,8 +84,27 @@ namespace My_Smart_Spaceship
             background.Update(gameTime);
             player.Update(gameTime);
             com.Update(gameTime);
+            foreach (Meteors m in meteor)
+            {
+                m.Update(graphics.GraphicsDevice);
+            }
+            //LoadMeteors();
+
+            //meteor.Update(gameTime);
             base.Update(gameTime);
         }
+
+        /*public void LoadMeteors()
+        {
+            int rand = random.Next(100, 700);
+            if (spawn > 1)
+            {
+                spawn = 0;
+                if (meteor.Capacity < 10)
+                    meteor.Add(new Meteors(Content.Load<Texture2D>("bigMeteor.png"), new Vector2(250, 250)));
+            }
+
+        }*/
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -91,6 +118,8 @@ namespace My_Smart_Spaceship
             background.Draw(gameTime,spriteBatch);
             player.Draw(gameTime,spriteBatch);
             com.Draw(gameTime, spriteBatch);
+            foreach(Meteors iterator in meteor)
+                    iterator.Draw(gameTime, spriteBatch);
             spriteBatch.End();
             // TODO: Add your drawing code here
 
