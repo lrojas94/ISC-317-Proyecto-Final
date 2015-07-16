@@ -82,7 +82,7 @@ namespace My_Smart_Spaceship
             //Check for shots:
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space)) {
                 //Shot a bullet.
-                Bullet b = inactiveBullets.Pop();
+                Bullet b = inactiveBullets.Pop();   // FIXME: Luis, la pila se vacio ... :)
                 b.StartBullet(position);
                 activeBullets.Add(b);
             }
@@ -102,7 +102,7 @@ namespace My_Smart_Spaceship
             prevKeyboardState = Keyboard.GetState();
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {  // Las balas son mas lentas que la nave ... :/
             foreach (Bullet b in activeBullets)
                 b.Draw(gameTime, spriteBatch);
             handler.DrawSprite(spriteBatch, position, spritePath,scale);
