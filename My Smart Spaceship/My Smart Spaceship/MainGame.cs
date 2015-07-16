@@ -35,7 +35,8 @@ namespace My_Smart_Spaceship
         Background background;
         Player player;
         COM com;
-        List<Meteors> meteor = new List<Meteors>();
+        //Meteors List
+        List<Meteors> meteorsList = new List<Meteors>();
 
         Random random = new Random();
         public MainGame()
@@ -98,6 +99,14 @@ namespace My_Smart_Spaceship
             // TODO: Add your update logic here
             background.Update(gameTime);
             player.Update(gameTime);
+            //For each meteor in meteorList
+            foreach (Meteors m in meteorsList)
+            {
+                m.Update(gameTime);
+            }
+
+            LoadMeteors();
+
             base.Update(gameTime);
         }
 
@@ -112,10 +121,38 @@ namespace My_Smart_Spaceship
             spriteBatch.Begin();
             background.Draw(gameTime,spriteBatch);
             player.Draw(gameTime,spriteBatch);
+
+            foreach (Meteors m in meteorsList)
+            {
+                m.Draw(gameTime,spriteBatch);
+            }
             spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        //Load Meteors
+        public void LoadMeteors()
+        {
+            //Creating random X and Y for the meteors
+            int randY = random.Next(-600, -50);
+            int randX = random.Next(0, 750);
+
+            //To make sure we have more than 5 meteors on the screen
+            if (meteorsList.Count() < 5)
+            {
+                meteorsList.Add(new Meteors(Content.Load<Texture2D>("bigMeteor.png"), new Vector2(randX, randY)));
+            }
+            //Remove is meteor was destroyed
+            for (int i = 0; i < meteorsList.Count; i++)
+            {
+                if (!meteorsList[i].isVisible)
+                {
+                    meteorsList.RemoveAt(i);
+                    i--;
+                }
+            }
         }
     }
 }

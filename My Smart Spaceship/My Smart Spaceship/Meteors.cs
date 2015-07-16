@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Content;
+
 
 namespace My_Smart_Spaceship
 {
@@ -11,40 +13,56 @@ namespace My_Smart_Spaceship
     {
         Texture2D sprite;
         Vector2 position;
-        Vector2 speed;
-        //int speed;
+        public Vector2 origin;
+        float rotation;
+        int speed;
+        Rectangle bounds;
+        public bool isVisible;
 
         Random random = new Random();
-        int randX, randY;
+        float randX, randY;
 
 
         public Meteors(Texture2D sprite, Vector2 position)
         {
             this.sprite = sprite;
             this.position = position;
+            speed = 4;
+            isVisible = true;
+            randX = random.Next(0, 750);
+            randY = random.Next(-600, -50);
 
-            randX = random.Next(-5, 5);
-            randY = random.Next(5, 1);
-            speed = new Vector2(randX, randY);
-            //position = new Vector2(MainGame.screenWidth / 4- sprite.Width/2, 0);
+        }
 
+        public void LoadContent(ContentManager Content)
+        {
+            sprite = Content.Load<Texture2D>("bigMeteor.png");
+            origin.X = sprite.Width / 2;
+            origin.Y = sprite.Height / 2;
 
         }
 
         public void Update(GameTime gameTime)
         {
-  
+            bounds = new Rectangle((int)position.X, (int)position.Y, 45, 45);
+
+            //movement
+            position.Y = position.Y + speed;
+            if (position.Y >= 600)
+                position.Y = -50;
+
+            //rotation
+            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            rotation += elapsed;
+            float circle = MathHelper.Pi * 2;
+            rotation = rotation % circle;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(sprite, position, Color.White);
+            if(isVisible)
+            spriteBatch.Draw(sprite, position, null, Color.White,rotation,origin,1.0f,SpriteEffects.None,0f);
         }
 
-
-        internal void Update(GraphicsDevice graphicsDevice)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
