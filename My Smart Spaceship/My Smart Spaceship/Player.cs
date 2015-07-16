@@ -55,7 +55,7 @@ namespace My_Smart_Spaceship
 
         public void Update(GameTime gameTime) {
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Rectangle sprite = handler.SpriteRectangle(spritePath,position,scale);
+            Rectangle spriteBounds = handler.SpriteRectangle(spritePath,position,scale);
 
             if (Keyboard.GetState().IsKeyDown(Keys.Left) || Keyboard.GetState().IsKeyDown(Keys.A))
                 position.X += -1 * playerSpeed.X * delta;
@@ -72,12 +72,12 @@ namespace My_Smart_Spaceship
             if (Keyboard.GetState().IsKeyDown(Keys.Down) || Keyboard.GetState().IsKeyDown(Keys.S))
                 position.Y += playerSpeed.Y * delta;
 
-            position = position.KeepInGameFrame(sprite);
+            position = position.KeepInGameFrame(spriteBounds);
 
             //Check for shots:
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space)) {
                 //Shot a bullet.
-                Bullet b = inactiveBullets.Pop();   // FIXME: Luis, la pila se vacio ... :)
+                Bullet b = inactiveBullets.Pop();
                 b.StartBullet(position);
                 activeBullets.Add(b);
             }
@@ -97,7 +97,7 @@ namespace My_Smart_Spaceship
             prevKeyboardState = Keyboard.GetState();
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {  // Las balas son mas lentas que la nave ... :/
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
             foreach (Bullet b in activeBullets)
                 b.Draw(gameTime, spriteBatch);
             handler.DrawSprite(spriteBatch, position, spritePath,scale);

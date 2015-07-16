@@ -101,6 +101,11 @@ namespace My_Smart_Spaceship
             SpriteData spr = spriteSheetData[path[0]][path[1]];
             spr.Draw(spriteBatch, spriteSheet, position,offset,scale);
         }
+        public void DrawSprite(SpriteBatch spriteBatch, Vector2 position, string spritePath, float rotation, float scale = 1.0f, SpriteEffects effects = SpriteEffects.None) {
+            string[] path = spritePath.Split('/');
+            SpriteData spr = spriteSheetData[path[0]][path[1]];
+            spr.Draw(spriteBatch, spriteSheet, position, rotation,scale,effects);
+        }
 
         #endregion
         #region AnimationHandling

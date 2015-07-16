@@ -46,6 +46,7 @@
     <Compile Include="Bullet.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="MainGame.cs" />
+    <Compile Include="MeteorController.cs" />
     <Compile Include="Meteors.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />

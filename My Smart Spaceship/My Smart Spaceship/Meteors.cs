@@ -11,57 +11,47 @@ namespace My_Smart_Spaceship
 {
     class Meteors
     {
-        Texture2D sprite;
-        Vector2 position;
-        public Vector2 origin;
-        float rotation;
-        int speed;
-        Rectangle bounds;
-        public bool isVisible;
+        private string spritePath;
+        private SpriteSheetHandler handler;
+        private Vector2 position = Vector2.Zero;
+        private float rotation;
+        private Vector2 velocity = Vector2.Zero;
+        private Rectangle bounds;
+        private bool isActive;
 
-        Random random = new Random();
-        float randX, randY;
+        public bool IsVisible {
+            get {
+                return isActive;
+            }
+        }
+        
 
-
-        public Meteors(Texture2D sprite, Vector2 position)
+        public Meteors(SpriteSheetHandler handler,string spritePath)
         {
-            this.sprite = sprite;
-            this.position = position;
-            speed = 4;
-            isVisible = true;
-            randX = random.Next(0, 750);
-            randY = random.Next(-600, -50);
+            this.handler = handler;
+            this.spritePath = spritePath;
+            isActive = true;
 
         }
 
-        public void LoadContent(ContentManager Content)
-        {
-            sprite = Content.Load<Texture2D>("bigMeteor.png");
-            origin.X = sprite.Width / 2;
-            origin.Y = sprite.Height / 2;
-
+        public void Start(Vector2 position, Vector2 velocity) {
+            isActive = true;
+            this.position = position;
+            this.velocity = velocity;
         }
 
         public void Update(GameTime gameTime)
         {
-            bounds = new Rectangle((int)position.X, (int)position.Y, 45, 45);
-
+            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
             //movement
-            position.Y = position.Y + speed;
-            if (position.Y >= 600)
-                position.Y = -50;
-
+            position += velocity * delta;
             //rotation
-            float elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            rotation += elapsed;
-            float circle = MathHelper.Pi * 2;
-            rotation = rotation % circle;
+            rotation += delta;
+            rotation = rotation % (MathHelper.Pi * 2);
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            if(isVisible)
-            spriteBatch.Draw(sprite, position, null, Color.White,rotation,origin,1.0f,SpriteEffects.None,0f);
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch){
+            handler.DrawSprite(spriteBatch, position, spritePath, rotation,1.0f,SpriteEffects.None);
         }
 
     }

@@ -20,7 +20,7 @@ namespace My_Smart_Spaceship
 
         public int ScreenHeight = 600;
         public int ScreenWidth = 800;
-        public SpriteSheetHandler spriteSheetHandler;
+        public SpriteSheetHandler SpriteSheetHandler;
 
         private static MainGame instance;
         public static MainGame Instance
@@ -33,6 +33,7 @@ namespace My_Smart_Spaceship
 
         }
 
+        
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Background background;
@@ -72,11 +73,11 @@ namespace My_Smart_Spaceship
         {
             // Create a new SpriteBatch, which can be used to draw textures.
 
-            spriteSheetHandler = new SpriteSheetHandler(@"Content\spriteSheet.sprites",@"Content\Animations.anim");
+            SpriteSheetHandler = new SpriteSheetHandler(@"Content\spriteSheet.sprites",@"Content\Animations.anim");
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
-            player = new Player(this.spriteSheetHandler,@"Players/playerA_Blue", new Vector2(500,500));
-            player.GenerateBullets(spriteSheetHandler);
+            player = new Player(this.SpriteSheetHandler,@"Players/playerA_Blue", new Vector2(500,500));
+            player.GenerateBullets(SpriteSheetHandler);
             //com = new COM(Content.Load<Texture2D>("com.png"), new Vector2(280, 280));
             // TODO: use this.Content to load your game content here
         }
@@ -145,12 +146,12 @@ namespace My_Smart_Spaceship
             //To make sure we have more than 5 meteors on the screen
             if (meteorsList.Count() < 5)
             {
-                meteorsList.Add(new Meteors(Content.Load<Texture2D>("bigMeteor.png"), new Vector2(randX, randY)));
+                meteorsList.Add(new Meteors(SpriteSheetHandler,@"Meteors/0"));
             }
             //Remove is meteor was destroyed
             for (int i = 0; i < meteorsList.Count; i++)
             {
-                if (!meteorsList[i].isVisible)
+                if (!meteorsList[i].IsVisible)
                 {
                     meteorsList.RemoveAt(i);
                     i--;

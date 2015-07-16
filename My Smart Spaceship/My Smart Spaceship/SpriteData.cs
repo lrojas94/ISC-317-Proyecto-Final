@@ -15,16 +15,19 @@ namespace My_Smart_Spaceship
         private int y;
         private int width;
         private int height;
+        private Vector2 origin;
+
 
         public SpriteData(int x, int y, int width, int height) {
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
+            origin = new Vector2(width / 2, height / 2);
         }
 
         
-        public Rectangle GetRectangle(){
+        private Rectangle GetRectangle(){
             return new Rectangle(x, y, width, height);
         }
 
@@ -48,11 +51,16 @@ namespace My_Smart_Spaceship
             spriteBatch.Draw(spriteSheet, GetPositionRectangle(position,scale), GetRectangle(), Color.White);
         }
 
-        public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet, Vector2 position,Vector2 offset, float scale = 1.0f)
-        {
+        public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet, Vector2 position,Vector2 offset, float scale = 1.0f){
             spriteBatch.Draw(spriteSheet, GetPositionRectangle(position,offset,scale), GetRectangle(), Color.White);
         }
-        
+
+        public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet, Vector2 position, float rotation, float scale = 1.0f, SpriteEffects effects = SpriteEffects.None){
+            spriteBatch.Draw( spriteSheet, GetPositionRectangle(position, scale), GetRectangle(),Color.White, rotation, origin, effects, 1.0f);
+        }
+
+
+
 
     }
 }
