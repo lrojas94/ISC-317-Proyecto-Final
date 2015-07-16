@@ -12,7 +12,8 @@
 :- dynamic arma_ia/1.
 :- dynamic arma_humano/1.
 :- dynamic destruible/1.
-:- dynamic indestructible/1.
+:- dynamic vulnerable/2.
+:- dynamic invulnerable/2.
 
 acercar(Objeto):- peligroso_ia(Objeto), !, fail.
 acercar(Objeto):- not(util_ia(Objeto)), !, fail.
@@ -44,23 +45,36 @@ util(Objeto):- util_ia(Objeto), !.
 util(Objeto):- arma_ia(Objeto), !.
 util(_):- !.
 
+% aprendizaje( evento(causa, consecuencia) ).
 
-aprendizaje((impacta(disparo(_), Objeto), Evento2)):- 
-		indestructible(Objeto), !.
-aprendizaje((impacta(disparo(_), Objeto), Evento2)):- 
-		not(Evento2 == explota(Objeto)),
-		not(Evento2 == perjudica(Objeto)),
-		assertz(indestructible(Objeto)), !.
-		
-aprendizaje((impacta(disparo(_), Objeto), explota(Objeto))):- 
+aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):- 
+		vulnerable(Estimulo, Objeto), !.
+aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):- 
+		assertz(vulnerable(Estimulo, Objeto)), !.
+
+aprendizaje( evento(impacta(Estimulo, Objeto), Consecuencia) ):- 
+		not(Consecuencia == perjudica(Estimulo, Objeto)),
+		invulnerable(Estimulo, Objeto), !.
+aprendizaje( evento(impacta(Estimulo, Objeto), Consecuencia) ):- 
+		not(Consecuencia == perjudica(Estimulo, Objeto)),
+		assertz(invulnerable(Estimulo, Objeto)), !.
+
+aprendizaje( evento(impacta(disparo(_), Objeto), explota(Objeto)) ):- 
 		destruible(Objeto), !.
-aprendizaje((impacta(disparo(_), Objeto), explota(Objeto))):-
+aprendizaje( evento(impacta(disparo(_), Objeto), explota(Objeto)) ):-
 		assertz(destruible(Objeto)), !.
 
-percepcion(Eventos):- evento_valido(Eventos), aprendizaje(Eventos).
+percepcion( evento(Causa, Consecuencia) ):- 
+	evento_valido(Causa), evento_valido(Consecuencia),
+	aprendizaje(evento(Causa, Consecuencia)), !.
+percepcion((evento(Causa, Consecuencia),EventosRestantes)):- 
+	evento_valido(Causa), evento_valido(Consecuencia),
+	aprendizaje(evento(Causa, Consecuencia)), 
+	percepcion(EventosRestantes).
 
 % eventos validos
-evento_valido(impacta(_,_)).
-evento_valido(explota(_)).
-evento_valido(mejora(_,_)).
-evento_valido(perjudica(_,_)).
+evento_valido(impacta(_,_)):- !.
+evento_valido(explota(_)):- !.
+evento_valido(mejora(_,_)):- !.
+evento_valido(perjudica(_,_)):- !.
+evento_valido( (EventoA, EventoB) ):- evento_valido(EventoA), evento_valido(EventoB).
