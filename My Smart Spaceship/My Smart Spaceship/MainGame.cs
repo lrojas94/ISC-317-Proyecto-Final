@@ -91,7 +91,7 @@ namespace My_Smart_Spaceship
             {
                 m.Update(graphics.GraphicsDevice);
             }
-            LoadMeteors();
+            //LoadMeteors();
 
             //meteor.Update(gameTime);
             base.Update(gameTime);
@@ -121,7 +121,8 @@ namespace My_Smart_Spaceship
             background.Draw(gameTime,spriteBatch);
             player.Draw(gameTime,spriteBatch);
             com.Draw(gameTime, spriteBatch);
-            meteor.Draw(gameTime, spriteBatch);
+            foreach(Meteors iterator in meteor)
+                    iterator.Draw(gameTime, spriteBatch);
             spriteBatch.End();
             // TODO: Add your drawing code here
 
