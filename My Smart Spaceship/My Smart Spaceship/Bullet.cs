@@ -58,6 +58,9 @@ namespace My_Smart_Spaceship
                     case BulletStates.Moving:
                         position += velocity * delta;
                         movingAnimation.Update(gameTime);
+                        Rectangle positionRectangle = movingAnimation.CurrentFrameRectangle(position,scale);
+                        if (positionRectangle.OutOfGameBounds())
+                            state = BulletStates.Inactive;
                         break;
                     case BulletStates.Exploding:
                         explodeAnimation.Update(gameTime);

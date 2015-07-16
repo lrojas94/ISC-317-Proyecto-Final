@@ -39,7 +39,8 @@ namespace My_Smart_Spaceship
             this.handler = handler;
             this.spritePath = spritePath;
             this.playerSpeed = playerSpeed;
-            this.shootingVelocity = new Vector2(0, -300);
+            shootingVelocity = -playerSpeed * 1.5f;
+            shootingVelocity.X = 0;
             Rectangle sprite = handler.SpriteRectangle(spritePath,Vector2.Zero,scale);
             position = new Vector2(MainGame.Instance.ScreenWidth / 2, MainGame.Instance.ScreenHeight - sprite.Height/2);
         }
@@ -71,14 +72,8 @@ namespace My_Smart_Spaceship
             if (Keyboard.GetState().IsKeyDown(Keys.Down))
                 position.Y += playerSpeed.Y * delta;
 
-            if (position.X - sprite.Width/2 < 0)
-                position.X = sprite.Width/2;
-            if (position.X + sprite.Width/2 > MainGame.Instance.ScreenWidth)
-                position.X = MainGame.Instance.ScreenWidth - sprite.Width/2;
-            if (position.Y - sprite.Height/2 < 0)
-                position.Y = sprite.Height/2;
-            if (position.Y + sprite.Height/2 > MainGame.Instance.ScreenHeight)
-                position.Y = MainGame.Instance.ScreenHeight - sprite.Height/2;
+            position = position.KeepInGameFrame(sprite);
+
             //Check for shots:
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space)) {
                 //Shot a bullet.
