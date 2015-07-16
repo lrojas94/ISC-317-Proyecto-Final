@@ -5,64 +5,96 @@
 % Las reglas "arma" indican que un powerup sirve para dañar al humano en manos 
 % del ia o viceversa.
 
-:- dynamic peligroso_ia/1.
-:- dynamic peligroso_humano/1.
-:- dynamic util_ia/1.
-:- dynamic util_humano/1.
-:- dynamic arma_ia/1.
-:- dynamic arma_humano/1.
+:- dynamic mejora/2.
 :- dynamic destruible/1.
 :- dynamic vulnerable/2.
 :- dynamic invulnerable/2.
 
-acercar(Objeto):- peligroso_ia(Objeto), !, fail.
-acercar(Objeto):- not(util_ia(Objeto)), !, fail.
-acercar(Objeto):- not(arma_ia(Objeto)), !, fail.
+acercar(Objeto):- vulnerable(Objeto, ia), !, fail.
+acercar(Objeto):- not(util(Objeto, ia)), !, fail.
 acercar(_):- !.
 
-alejar(Objeto):- not(peligroso_ia(Objeto)), !, fail.
-alejar(Objeto):- util_ia(Objeto), !, fail.
-alejar(Objeto):- arma_ia(Objeto), !, fail.
+alejar(Objeto):- not(vulnerable(Objeto, ia)), !, fail.
+alejar(Objeto):- util(Objeto, ia), !, fail.
 alejar(_):- !.
 
-disparar(Objeto):- indestructible(Objeto), !, fail.
-disparar(Objeto):- util(Objeto), !, fail.
+disparar(Objeto):- not(destruible(Objeto)), !, fail.
+disparar(Objeto):- invulnerable(disparo(ia), Objeto), !, fail.
+disparar(Objeto):- util(Objeto, ia), !, fail.
 disparar(_):- !.
 
-% La regla mover toma una lista de objetos que estan cerca de la IA (la cercania)
-% se decide en el código en C#.
+% La regla mover toma una lista de objetos que estan cerca de la IA 
+% (la cercania) se decide en el código en C#.
 mover([], []):- !.
-mover([], _).
-mover([Objeto], [Objeto]). 
+mover([], _):- !.
 mover([Objeto|ListaObjetosCercanos], Acciones):- 
-		alejar(Objeto), mover(ListaObjetosCercanos, L), Acciones = [alejar|L].
+		alejar(Objeto), mover(ListaObjetosCercanos, L), Acciones=[alejar|L],!.
 mover([Objeto|ListaObjetosCercanos], Acciones):- 
-		acercar(Objeto), mover(ListaObjetosCercanos, L), Acciones = [acercar|L].
+		acercar(Objeto), mover(ListaObjetosCercanos, L), Acciones=[acercar|L],!.
+mover([_|ListaObjetosCercanos], Acciones):- 
+		mover(ListaObjetosCercanos, L), Acciones = [quedarse_quieto|L], !.
 
-util(Objeto):- peligroso_ia(Objeto), !, fail.
-util(Objeto):- arma_humano(Objeto), !, fail.
-util(Objeto):- util_ia(Objeto), !.
-util(Objeto):- arma_ia(Objeto), !.
+% Objetos considerados como upgrades de artilleria.
+arma(Objeto, ia):- mejora(Objeto, armamento_ia), !.
+arma(Objeto, humano):- mejora(Objeto, armamento_humano), !.
+
+% Todas las consideraciones de si algo es util para la IA.
+util(Objeto, ia):- vulnerable(Objeto, ia), !, fail.
+util(Objeto, ia):- arma(Objeto, humano), !, fail.
+util(Objeto, ia):- mejora(Objeto, ia), !.
+util(Objeto, ia):- arma(Objeto, ia), !.
 util(_):- !.
 
-% aprendizaje( evento(causa, consecuencia) ).
+% uso general: aprendizaje( evento(causa, consecuencia) ).
 
+% Cosas que son vulnerables a que cosas: Naves a disparos, asteroides, etc ...
+aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):- 
+		mejora(Estimulo, Objeto), retract(mejora(Estimulo, Objeto)), fail.
+aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):- 
+		invulnerable(Estimulo, Objeto), retract(invulnerable(Estimulo, Objeto)), fail.
 aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):- 
 		vulnerable(Estimulo, Objeto), !.
 aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):- 
-		assertz(vulnerable(Estimulo, Objeto)), !.
+		assertz(vulnerable(Estimulo, Objeto)),
+		assertz(destruible(Objeto)), !.
 
-aprendizaje( evento(impacta(Estimulo, Objeto), Consecuencia) ):- 
-		not(Consecuencia == perjudica(Estimulo, Objeto)),
+
+% Que objetos llegan a explotar, es decir, pueden ser destruidos.
+aprendizaje( evento(impacta(Estimulo, Objeto), explota(Objeto)) ):- 
+		not(vulnerable(_, Objeto)), assertz(vulnerable(Estimulo, Objeto)), fail.
+aprendizaje( evento(impacta(Estimulo, Objeto), explota(Objeto)) ):- 
+		invulnerable(Estimulo, Objeto), retract(invulnerable(Estimulo, Objeto)), 
+		fail.
+aprendizaje( evento(impacta(_, Objeto), explota(Objeto)) ):- 
+		destruible(Objeto), !.
+aprendizaje( evento(impacta(_, Objeto), explota(Objeto)) ):-
+		assertz(destruible(Objeto)), !.
+
+
+% Que cosas benefician a un objeto.
+aprendizaje( evento(impacta(PowerUp, Objeto), beneficia(PowerUp, Objeto)) ):-
+		vulnerable(PowerUp, Objeto), retract(vulnerable(PowerUp, Objeto)), fail.
+aprendizaje( evento(impacta(PowerUp, Objeto), beneficia(PowerUp, Objeto)) ):-
+		not(vulnerable(_, Objeto)), retract(destruible(Objeto)), fail.
+aprendizaje( evento(impacta(PowerUp, Objeto), beneficia(PowerUp, Objeto)) ):-
+		mejora(PowerUp, Objeto), !.
+aprendizaje( evento(impacta(PowerUp, Objeto), beneficia(PowerUp, Objeto)) ):-
+		assertz(mejora(PowerUp, Objeto)), !.
+
+
+% Que cosas no dañan a un objeto: disparos a los asteroides blancos ...
+aprendizaje( evento(impacta(Estimulo, Objeto), evento_nulo) ):- 
+		vulnerable(Estimulo,Objeto), retract(vulnerable(Estimulo,Objeto)), fail.
+aprendizaje( evento(impacta(_, Objeto), evento_nulo) ):- 
+		not(vulnerable(_,Objeto)), retract(destruible(Objeto)), fail.
+aprendizaje( evento(impacta(Estimulo, Objeto), evento_nulo) ):- 
 		invulnerable(Estimulo, Objeto), !.
-aprendizaje( evento(impacta(Estimulo, Objeto), Consecuencia) ):- 
-		not(Consecuencia == perjudica(Estimulo, Objeto)),
+aprendizaje( evento(impacta(Estimulo, Objeto), evento_nulo) ):- 
 		assertz(invulnerable(Estimulo, Objeto)), !.
 
-aprendizaje( evento(impacta(Estimulo, Objeto), explota(Objeto)) ):- 
-		destruible(Objeto), !.
-aprendizaje( evento(impacta(Estimulo, Objeto), explota(Objeto)) ):-
-		assertz(destruible(Objeto)), !.
+
+% La regla percepcion se encarga de recibir los "eventos" que suceden 
+% desde el codigo C# y aprende de lo que acontece alrededor de la nave de la IA.
 
 percepcion( evento(Causa, Consecuencia) ):- 
 	evento_valido(Causa), evento_valido(Consecuencia),
@@ -73,8 +105,10 @@ percepcion((evento(Causa, Consecuencia),EventosRestantes)):-
 	percepcion(EventosRestantes).
 
 % eventos validos
+evento_valido(evento_nulo):- !.
 evento_valido(impacta(_,_)):- !.
 evento_valido(explota(_)):- !.
-evento_valido(mejora(_,_)):- !.
+evento_valido(beneficia(_,_)):- !.
 evento_valido(perjudica(_,_)):- !.
-evento_valido( (EventoA, EventoB) ):- evento_valido(EventoA), evento_valido(EventoB).
+evento_valido( (EventoA, EventoB) ):- 
+		evento_valido(EventoA), evento_valido(EventoB).
