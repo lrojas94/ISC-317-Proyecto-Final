@@ -34,10 +34,12 @@ namespace My_Smart_Spaceship
             }
         }
 
-        public Bullet(float scale = 1.0f)
+        public Bullet(SpriteSheetHandler handler,Vector2 velocity,float scale = 1.0f)
         {
+            this.velocity = velocity;
             this.scale = scale;
-            movingAnimation = MainGame.Instance.spriteSheetHandler.AnimatorWithAnimation("BlueBullet_Move");
+            movingAnimation = handler.AnimatorWithAnimation("BlueBullet_Move");
+            explodeAnimation = handler.AnimatorWithAnimation("BlueBullet_Explode");
         }
 
         public void StartBullet(Vector2 position) {
@@ -75,10 +77,10 @@ namespace My_Smart_Spaceship
                 switch (state)
                 {
                     case BulletStates.Moving:
-                        movingAnimation.Draw(spriteBatch, position);
+                        movingAnimation.Draw(spriteBatch, position,scale);
                         break;
                     case BulletStates.Exploding:
-                        explodeAnimation.Draw(spriteBatch, position);
+                        explodeAnimation.Draw(spriteBatch, position,scale);
                         break;
                     case BulletStates.Inactive:
                         break;

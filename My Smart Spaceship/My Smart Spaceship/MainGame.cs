@@ -74,7 +74,8 @@ namespace My_Smart_Spaceship
             spriteSheetHandler = new SpriteSheetHandler(@"Content\spriteSheet.sprites",@"Content\Animations.anim");
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
-            player = new Player(@"Players/playerA_Blue", new Vector2(500,500));
+            player = new Player(this.spriteSheetHandler,@"Players/playerA_Blue", new Vector2(500,500));
+            player.GenerateBullets(spriteSheetHandler);
             //com = new COM(Content.Load<Texture2D>("com.png"), new Vector2(280, 280));
             // TODO: use this.Content to load your game content here
         }

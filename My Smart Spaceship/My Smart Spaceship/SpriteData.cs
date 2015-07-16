@@ -35,11 +35,11 @@ namespace My_Smart_Spaceship
                 (int)(width * scale), (int)(height * scale));
         }
 
-        public Rectangle GetPositionRectangle(Vector2 position,Vector2 offset)
+        public Rectangle GetPositionRectangle(Vector2 position,Vector2 offset,float scale = 1.0f)
         {
             //IMPORTANT NOTE: This gets drawn from the CENTER instead of the TopLeft corner.
             //This is because the animation software used works like that.
-            Rectangle rectangle = GetPositionRectangle(position);
+            Rectangle rectangle = GetPositionRectangle(position,scale);
             rectangle.Offset(offset);
             return rectangle;
         }
@@ -50,7 +50,7 @@ namespace My_Smart_Spaceship
 
         public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet, Vector2 position,Vector2 offset, float scale = 1.0f)
         {
-            spriteBatch.Draw(spriteSheet, GetPositionRectangle(position,offset), GetRectangle(), Color.White);
+            spriteBatch.Draw(spriteSheet, GetPositionRectangle(position,offset,scale), GetRectangle(), Color.White);
         }
         
 

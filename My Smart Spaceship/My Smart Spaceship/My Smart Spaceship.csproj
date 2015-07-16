@@ -40,7 +40,6 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Animation.cs" />
     <Compile Include="Animator.cs" />
     <Compile Include="Background.cs" />
     <Compile Include="COM.cs" />
@@ -85,6 +84,7 @@
   <ItemGroup>
     <Content Include="Content\Animations.anim">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Content\spriteSheet.sprites">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

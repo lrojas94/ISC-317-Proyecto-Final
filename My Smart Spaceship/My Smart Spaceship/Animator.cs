@@ -49,8 +49,8 @@ namespace My_Smart_Spaceship
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 position) {
-            handler.DrawSprite(spriteBatch, position, animation[currentFrame].SpritePath, animation[currentFrame].Offset);
+        public void Draw(SpriteBatch spriteBatch, Vector2 position, float scale = 1.0f) {
+            handler.DrawSprite(spriteBatch, position, animation[currentFrame].SpritePath, animation[currentFrame].Offset, scale);
         }
 
         public Rectangle CurrentFrameRectangle(Vector2 position,float scale = 1.0f) {
