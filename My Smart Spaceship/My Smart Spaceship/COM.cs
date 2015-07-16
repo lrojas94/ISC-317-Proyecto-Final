@@ -16,7 +16,7 @@ namespace My_Smart_Spaceship
         public COM(Texture2D sprite,Vector2 playerSpeed) {
             this.sprite = sprite;
             this.playerSpeed = playerSpeed;
-            position = new Vector2(MainGame.screenWidth / 2 - sprite.Width / 2, 0);
+            position = new Vector2(MainGame.screenWidth / 2 - sprite.Width / 2, sprite.Height);
         }
 
         public void Update(GameTime gameTime) {
