@@ -104,9 +104,13 @@ percepcion((evento(Causa, Consecuencia),EventosRestantes)):-
 	aprendizaje(evento(Causa, Consecuencia)), 
 	percepcion(EventosRestantes).
 
-% eventos validos
-evento_valido(evento_nulo):- !.
+% Eventos validos
+% Causas
 evento_valido(impacta(_,_)):- !.
+
+
+% Consecuencias
+evento_valido(evento_nulo):- !.
 evento_valido(explota(_)):- !.
 evento_valido(beneficia(_,_)):- !.
 evento_valido(perjudica(_,_)):- !.
