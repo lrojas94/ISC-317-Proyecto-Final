@@ -57,19 +57,19 @@ namespace My_Smart_Spaceship
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Rectangle sprite = handler.SpriteRectangle(spritePath,position,scale);
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            if (Keyboard.GetState().IsKeyDown(Keys.Left) || Keyboard.GetState().IsKeyDown(Keys.A))
                 position.X += -1 * playerSpeed.X * delta;
-           
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Right) || Keyboard.GetState().IsKeyDown(Keys.D))
                 position.X += playerSpeed.X * delta;
-            
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Up) || Keyboard.GetState().IsKeyDown(Keys.W))
                 position.Y += -1 * playerSpeed.Y * delta;
-            
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Down) || Keyboard.GetState().IsKeyDown(Keys.S))
                 position.Y += playerSpeed.Y * delta;
 
             position = position.KeepInGameFrame(sprite);
@@ -77,7 +77,7 @@ namespace My_Smart_Spaceship
             //Check for shots:
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space)) {
                 //Shot a bullet.
-                Bullet b = inactiveBullets.Pop();
+                Bullet b = inactiveBullets.Pop();   // FIXME: Luis, la pila se vacio ... :)
                 b.StartBullet(position);
                 activeBullets.Add(b);
             }
@@ -97,7 +97,7 @@ namespace My_Smart_Spaceship
             prevKeyboardState = Keyboard.GetState();
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {  // Las balas son mas lentas que la nave ... :/
             foreach (Bullet b in activeBullets)
                 b.Draw(gameTime, spriteBatch);
             handler.DrawSprite(spriteBatch, position, spritePath,scale);
