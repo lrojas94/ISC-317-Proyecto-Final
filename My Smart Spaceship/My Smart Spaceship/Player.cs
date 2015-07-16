@@ -18,12 +18,8 @@ namespace My_Smart_Spaceship
         public Player(string spritePath,Vector2 playerSpeed) {
             this.spritePath = spritePath;
             this.playerSpeed = playerSpeed;
-<<<<<<< HEAD
-            position = new Vector2(MainGame.screenWidth / 2 - sprite.Width / 2, MainGame.screenHeight - 2*sprite.Height);
-=======
             Rectangle sprite = MainGame.Instance.spriteSheetHandler.SpriteRectangle(spritePath);
             position = new Vector2(MainGame.Instance.ScreenWidth / 2, MainGame.Instance.ScreenHeight - sprite.Height/2);
->>>>>>> dev
         }
 
         public void Update(GameTime gameTime) {

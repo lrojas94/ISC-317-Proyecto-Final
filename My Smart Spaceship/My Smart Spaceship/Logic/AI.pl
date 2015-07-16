@@ -59,9 +59,9 @@ aprendizaje( evento(impacta(Estimulo, Objeto), Consecuencia) ):-
 		not(Consecuencia == perjudica(Estimulo, Objeto)),
 		assertz(invulnerable(Estimulo, Objeto)), !.
 
-aprendizaje( evento(impacta(disparo(_), Objeto), explota(Objeto)) ):- 
+aprendizaje( evento(impacta(Estimulo, Objeto), explota(Objeto)) ):- 
 		destruible(Objeto), !.
-aprendizaje( evento(impacta(disparo(_), Objeto), explota(Objeto)) ):-
+aprendizaje( evento(impacta(Estimulo, Objeto), explota(Objeto)) ):-
 		assertz(destruible(Objeto)), !.
 
 percepcion( evento(Causa, Consecuencia) ):- 
