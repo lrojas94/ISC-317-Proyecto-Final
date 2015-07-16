@@ -16,7 +16,11 @@ namespace My_Smart_Spaceship
         public COM(Texture2D sprite,Vector2 playerSpeed) {
             this.sprite = sprite;
             this.playerSpeed = playerSpeed;
+<<<<<<< HEAD
             position = new Vector2(MainGame.screenWidth / 2 - sprite.Width / 2, sprite.Height);
+=======
+            position = new Vector2(MainGame.Instance.ScreenWidth / 2 - sprite.Width / 2, 0);
+>>>>>>> dev
         }
 
         public void Update(GameTime gameTime) {
@@ -24,12 +28,12 @@ namespace My_Smart_Spaceship
 
             if (position.X < 0)
                 position.X = 0;
-            if (position.X + sprite.Width > MainGame.screenWidth)
-                position.X = MainGame.screenWidth - sprite.Width;
+            if (position.X + sprite.Width > MainGame.Instance.ScreenWidth)
+                position.X = MainGame.Instance.ScreenWidth - sprite.Width;
             if (position.Y < 0)
                 position.Y = 0;
-            if (position.Y + sprite.Height > MainGame.screenHeight)
-                position.Y = MainGame.screenHeight - sprite.Height;
+            if (position.Y + sprite.Height > MainGame.Instance.ScreenHeight)
+                position.Y = MainGame.Instance.ScreenHeight - sprite.Height;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {

@@ -2,8 +2,11 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using SbsSW.SwiPlCs;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SbsSW.SwiPlCs;
+
 
 namespace My_Smart_Spaceship
 {
@@ -12,20 +15,34 @@ namespace My_Smart_Spaceship
     /// </summary>
     public class MainGame : Game
     {
-        public static int screenHeight = 600;
-        public static int screenWidth = 800;
+        public int ScreenHeight = 600;
+        public int ScreenWidth = 800;
+        public SpriteSheetHandler spriteSheetHandler;
+
+        private static MainGame instance;
+        public static MainGame Instance
+        {
+            get{
+                if (instance == null)
+                    instance = new MainGame();
+                return instance;
+            }
+
+        }
+
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Background background;
         Player player;
         COM com;
         List<Meteors> meteor = new List<Meteors>();
+
         Random random = new Random();
         public MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferHeight = screenHeight;
-            graphics.PreferredBackBufferWidth = screenWidth;
+            graphics.PreferredBackBufferHeight = ScreenHeight;
+            graphics.PreferredBackBufferWidth = ScreenWidth;
             Content.RootDirectory = "Content";
             IsFixedTimeStep = true;
         }
@@ -47,20 +64,23 @@ namespace My_Smart_Spaceship
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
-        /// 
-
-        float spawn = 0;
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
+
+            spriteSheetHandler = new SpriteSheetHandler("Content/spriteSheet.sprites");
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
+<<<<<<< HEAD
             player = new Player(Content.Load<Texture2D>("player.png"), new Vector2(150,150));
             com = new COM(Content.Load<Texture2D>("com.png"), new Vector2(140, 140));
+=======
+            player = new Player(@"Players\playerA_Blue", new Vector2(500,500));
+            //com = new COM(Content.Load<Texture2D>("com.png"), new Vector2(280, 280));
+
+>>>>>>> dev
             // TODO: use this.Content to load your game content here
         }
-
-         
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
@@ -83,28 +103,8 @@ namespace My_Smart_Spaceship
             // TODO: Add your update logic here
             background.Update(gameTime);
             player.Update(gameTime);
-            com.Update(gameTime);
-            foreach (Meteors m in meteor)
-            {
-                m.Update(graphics.GraphicsDevice);
-            }
-            //LoadMeteors();
-
-            //meteor.Update(gameTime);
             base.Update(gameTime);
         }
-
-        /*public void LoadMeteors()
-        {
-            int rand = random.Next(100, 700);
-            if (spawn > 1)
-            {
-                spawn = 0;
-                if (meteor.Capacity < 10)
-                    meteor.Add(new Meteors(Content.Load<Texture2D>("bigMeteor.png"), new Vector2(250, 250)));
-            }
-
-        }*/
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -117,9 +117,6 @@ namespace My_Smart_Spaceship
             spriteBatch.Begin();
             background.Draw(gameTime,spriteBatch);
             player.Draw(gameTime,spriteBatch);
-            com.Draw(gameTime, spriteBatch);
-            foreach(Meteors iterator in meteor)
-                    iterator.Draw(gameTime, spriteBatch);
             spriteBatch.End();
             // TODO: Add your drawing code here
 
