@@ -16,12 +16,17 @@ namespace My_Smart_Spaceship
 
     class Bullet
     {
-        private Texture2D sprite;
+        private enum BulletStates {
+            Moving,Exploding,Inactive
+        }
+        private BulletStates state = BulletStates.Inactive;
         private Vector2 position;
         private Vector2 velocity;
-        private bool shouldMove;
+        private bool shouldMove = true;
         private bool isActive = false;
-        private Animation animation;
+        private Animator movingAnimation;
+        private Animator explodeAnimation;
+        private float scale;
 
         public bool IsActive {
             get{
@@ -29,25 +34,56 @@ namespace My_Smart_Spaceship
             }
         }
 
-        public Bullet(Texture2D sprite)
+        public Bullet(float scale = 1.0f)
         {
-            this.sprite = sprite;
-            animation = new Animation(sprite, 15, 10, 2);
+            this.scale = scale;
+            movingAnimation = MainGame.Instance.spriteSheetHandler.AnimatorWithAnimation("BlueBullet_Move");
         }
 
         public void StartBullet(Vector2 position) {
             this.position = position;
             isActive = true;
+            state = BulletStates.Moving;
+            movingAnimation.Reset();
+            explodeAnimation.Reset();
         }
 
         public void Update(GameTime gameTime) {
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            position += velocity * delta;
-            animation.Update(gameTime);
+            if (isActive) {
+                switch (state)
+                {
+                    case BulletStates.Moving:
+                        position += velocity * delta;
+                        movingAnimation.Update(gameTime);
+                        break;
+                    case BulletStates.Exploding:
+                        explodeAnimation.Update(gameTime);
+                        if (explodeAnimation.IsDone)
+                            state = BulletStates.Inactive;
+                        break;
+                    case BulletStates.Inactive:
+                        isActive = false;
+                        break;
+                }
+            } 
+           
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
-            animation.Draw(position, gameTime, spriteBatch);
+            if (isActive) {
+                switch (state)
+                {
+                    case BulletStates.Moving:
+                        movingAnimation.Draw(spriteBatch, position);
+                        break;
+                    case BulletStates.Exploding:
+                        explodeAnimation.Draw(spriteBatch, position);
+                        break;
+                    case BulletStates.Inactive:
+                        break;
+                }
+            }
         }
     }
 }

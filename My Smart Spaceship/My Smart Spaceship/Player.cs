@@ -10,22 +10,40 @@ namespace My_Smart_Spaceship
 {
     class Player
     {
-        string spritePath;
-        Vector2 position;
-        Vector2 playerSpeed;
+        private string spritePath;
+        private Vector2 position;
+        private Vector2 playerSpeed;
+        private float scale = 0.5f;
+        private Stack<Bullet> inactiveBullets = new Stack<Bullet>();
+        private List<Bullet> activeBullets = new List<Bullet>();
+
+        public float Scale {
+            get{
+                return scale;
+            }
+            set {
+                scale = value;
+            }
+        }
         
+        public Rectangle Rectangle {
+            get {
+                return MainGame.Instance.spriteSheetHandler.SpriteRectangle(spritePath,position,scale);
+            }
+        }
        
         public Player(string spritePath,Vector2 playerSpeed) {
             this.spritePath = spritePath;
             this.playerSpeed = playerSpeed;
-            Rectangle sprite = MainGame.Instance.spriteSheetHandler.SpriteRectangle(spritePath);
+            Rectangle sprite = MainGame.Instance.spriteSheetHandler.SpriteRectangle(spritePath,Vector2.Zero,scale);
             position = new Vector2(MainGame.Instance.ScreenWidth / 2, MainGame.Instance.ScreenHeight - sprite.Height/2);
         }
 
+
+
         public void Update(GameTime gameTime) {
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            Rectangle sprite = MainGame.Instance.spriteSheetHandler.SpriteRectangle(spritePath);
+            Rectangle sprite = MainGame.Instance.spriteSheetHandler.SpriteRectangle(spritePath,position,scale);
 
             if (Keyboard.GetState().IsKeyDown(Keys.Left))
                 position.X += -1 * playerSpeed.X * delta;
@@ -53,7 +71,7 @@ namespace My_Smart_Spaceship
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
-            MainGame.Instance.spriteSheetHandler.DrawSprite(spriteBatch, position, spritePath);
+            MainGame.Instance.spriteSheetHandler.DrawSprite(spriteBatch, position, spritePath,scale);
         }
     }
 }

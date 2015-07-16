@@ -13,8 +13,11 @@ namespace My_Smart_Spaceship
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
+    /// 
     public class MainGame : Game
     {
+        
+
         public int ScreenHeight = 600;
         public int ScreenWidth = 800;
         public SpriteSheetHandler spriteSheetHandler;
@@ -68,10 +71,10 @@ namespace My_Smart_Spaceship
         {
             // Create a new SpriteBatch, which can be used to draw textures.
 
-            spriteSheetHandler = new SpriteSheetHandler("Content/spriteSheet.sprites");
+            spriteSheetHandler = new SpriteSheetHandler(@"Content\spriteSheet.sprites",@"Content\Animations.anim");
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
-            player = new Player(@"Players\playerA_Blue", new Vector2(500,500));
+            player = new Player(@"Players/playerA_Blue", new Vector2(500,500));
             //com = new COM(Content.Load<Texture2D>("com.png"), new Vector2(280, 280));
 
             // TODO: use this.Content to load your game content here

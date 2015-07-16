@@ -15,15 +15,6 @@ namespace My_Smart_Spaceship
         private int y;
         private int width;
         private int height;
-        private Vector2 offset;
-        public Vector2 Offset {
-            get {
-                return offset;
-            }
-            set {
-                offset = value;
-            }
-        }
 
         public SpriteData(int x, int y, int width, int height) {
             this.x = x;
@@ -37,15 +28,31 @@ namespace My_Smart_Spaceship
             return new Rectangle(x, y, width, height);
         }
 
-        public Rectangle GetPositionRectangle(Vector2 position) {
+        public Rectangle GetPositionRectangle(Vector2 position,float scale = 1.0f) {
             //IMPORTANT NOTE: This gets drawn from the CENTER instead of the TopLeft corner.
             //This is because the animation software used works like that.
-            return new Rectangle((int)position.X + (int)offset.X - width/2, (int)position.Y + (int)offset.Y - height/2, width, height);
+            return new Rectangle((int)position.X - (int)(width * scale) / 2, (int)position.Y - (int)(height * scale) / 2, 
+                (int)(width * scale), (int)(height * scale));
         }
 
-        public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet,Vector2 position) {
-            spriteBatch.Draw(spriteSheet, GetPositionRectangle(position), GetRectangle(), Color.White);
+        public Rectangle GetPositionRectangle(Vector2 position,Vector2 offset)
+        {
+            //IMPORTANT NOTE: This gets drawn from the CENTER instead of the TopLeft corner.
+            //This is because the animation software used works like that.
+            Rectangle rectangle = GetPositionRectangle(position);
+            rectangle.Offset(offset);
+            return rectangle;
         }
+
+        public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet,Vector2 position,float scale = 1.0f) {
+            spriteBatch.Draw(spriteSheet, GetPositionRectangle(position,scale), GetRectangle(), Color.White);
+        }
+
+        public void Draw(SpriteBatch spriteBatch, Texture2D spriteSheet, Vector2 position,Vector2 offset, float scale = 1.0f)
+        {
+            spriteBatch.Draw(spriteSheet, GetPositionRectangle(position,offset), GetRectangle(), Color.White);
+        }
+        
 
     }
 }
