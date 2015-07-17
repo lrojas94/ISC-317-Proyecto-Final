@@ -97,9 +97,9 @@ namespace My_Smart_Spaceship
             prevKeyboardState = Keyboard.GetState();
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+        public void Draw(SpriteBatch spriteBatch) {
             foreach (Bullet b in activeBullets)
-                b.Draw(gameTime, spriteBatch);
+                b.Draw(spriteBatch);
             handler.DrawSprite(spriteBatch, position, spritePath,scale);
         }
     }

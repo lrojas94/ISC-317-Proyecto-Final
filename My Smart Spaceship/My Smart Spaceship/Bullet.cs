@@ -34,6 +34,19 @@ namespace My_Smart_Spaceship
             }
         }
 
+        public Rectangle Rectangle {
+            get {
+                switch (state)
+                {
+                    case BulletStates.Moving:
+                        return movingAnimation.CurrentFrameRectangle(position, scale);
+                    case BulletStates.Exploding:
+                        return explodeAnimation.CurrentFrameRectangle(position, scale);
+                    default:
+                        return new Rectangle(0,0,0,0);
+                }
+            }
+        }
         public Bullet(SpriteSheetHandler handler,Vector2 velocity,float scale = 1.0f)
         {
             this.velocity = velocity;
@@ -75,7 +88,7 @@ namespace My_Smart_Spaceship
            
         }
 
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
+        public void Draw(SpriteBatch spriteBatch) {
             if (isActive) {
                 switch (state)
                 {
