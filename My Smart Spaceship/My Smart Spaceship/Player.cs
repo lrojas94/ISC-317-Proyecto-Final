@@ -10,22 +10,22 @@ namespace My_Smart_Spaceship
 {
     class Player
     {
-        private enum PlayerStates {
+        protected enum PlayerStates {
             Alive,Dead
         }
 
-        private string spritePath;
-        private Vector2 position;
-        private Vector2 playerSpeed;
-        private float scale = 0.5f;
-        private Vector2 shootingVelocity;
-        private Stack<Bullet> inactiveBullets = new Stack<Bullet>();
-        private List<Bullet> activeBullets = new List<Bullet>();
-        private SpriteSheetHandler handler;
-        private KeyboardState prevKeyboardState = Keyboard.GetState();
-        private Animator explosionAnimation;
-        private PlayerStates state = PlayerStates.Alive;
-        private float animationScale;
+        protected string spritePath;
+        protected Vector2 position;
+        protected Vector2 playerSpeed;
+        protected float scale = 0.5f;
+        protected Vector2 shootingVelocity;
+        protected Stack<Bullet> inactiveBullets = new Stack<Bullet>();
+        protected List<Bullet> activeBullets = new List<Bullet>();
+        protected SpriteSheetHandler handler;
+        protected KeyboardState prevKeyboardState = Keyboard.GetState();
+        protected Animator explosionAnimation;
+        protected PlayerStates state = PlayerStates.Alive;
+        protected float animationScale;
 
         public float Scale {
             get{
@@ -80,7 +80,7 @@ namespace My_Smart_Spaceship
         }
 
 
-        public void Update(GameTime gameTime) {
+        public virtual void Update(GameTime gameTime) {
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
             switch (state) {
                 case PlayerStates.Alive:
@@ -131,7 +131,7 @@ namespace My_Smart_Spaceship
             prevKeyboardState = Keyboard.GetState();
         }
 
-        public void Draw(SpriteBatch spriteBatch) {
+        public virtual void Draw(SpriteBatch spriteBatch) {
             foreach (Bullet b in activeBullets)
                 b.Draw(spriteBatch);
 

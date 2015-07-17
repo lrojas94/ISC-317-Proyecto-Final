@@ -79,10 +79,10 @@ namespace My_Smart_Spaceship
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
             player = new Player(this.SpriteSheetHandler,@"Players/playerA_Blue", new Vector2(500,500));
             player.GenerateBullets(SpriteSheetHandler);
+            com = new COM(this.SpriteSheetHandler, @"Players/playerA_Blue", new Vector2(500, 500));
             meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",300f,
                 new Vector2(300, 100),new Vector2(100,50), new Point(0, 9), new Point(10, 19));
-            //com = new COM(Content.Load<Texture2D>("com.png"), new Vector2(280, 280));
-            // TODO: use this.Content to load your game content here
+            
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace My_Smart_Spaceship
             background.Update(gameTime);
             meteorController.Update(gameTime);
             player.Update(gameTime);
-
+            com.Update(gameTime);
             #region Collisions
             //PlayerBullets and Asteroids:
             List<Bullet> playerBullets = player.Bullets;
@@ -167,6 +167,7 @@ namespace My_Smart_Spaceship
             background.Draw(gameTime,spriteBatch);
             meteorController.Draw(spriteBatch);
             player.Draw(spriteBatch);
+            com.Draw(spriteBatch);
           
             spriteBatch.End();
             // TODO: Add your drawing code here
