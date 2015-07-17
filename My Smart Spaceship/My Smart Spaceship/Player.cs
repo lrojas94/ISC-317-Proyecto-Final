@@ -80,7 +80,7 @@ namespace My_Smart_Spaceship
         }
 
 
-        public virtual void Update(GameTime gameTime) {
+        public void Update(GameTime gameTime) {
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
             switch (state) {
                 case PlayerStates.Alive:
@@ -133,7 +133,7 @@ namespace My_Smart_Spaceship
             prevKeyboardState = Keyboard.GetState();
         }
 
-        public virtual void Draw(SpriteBatch spriteBatch) {
+        public void Draw(SpriteBatch spriteBatch) {
             foreach (Bullet b in activeBullets)
                 b.Draw(spriteBatch);
 

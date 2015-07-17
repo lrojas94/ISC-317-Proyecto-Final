@@ -16,12 +16,19 @@ namespace My_Smart_Spaceship
 
         }
 
-        override public void Update(GameTime gameTime) {
+        public void Update(GameTime gameTime)
+        {
             //Update Code ^^
         }
 
-        override public void Draw(SpriteBatch spriteBatch) {
+        public void Draw(SpriteBatch spriteBatch) {
             //Drawing Code.
+            switch (state) {
+                case PlayerStates.Alive:
+                    handler.DrawSprite(spriteBatch, position, spritePath,0,scale,SpriteEffects.FlipVertically);
+                    break;
+            }
+            
         }
 
         // Este metodo sera la abstraccion entre C# y prolog para las consultas'
