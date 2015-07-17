@@ -36,16 +36,19 @@ namespace My_Smart_Spaceship
 
         public Vector2 MinVelocity
         {
-            get
-            {
+            get{
                 return minVelocity;
             }
-            set
-            {
+            set{
                 minVelocity = value;
             }
         }
 
+        public List<Meteors> Meteors{
+            get{
+                return activeMeteors;
+            }
+        }
 
         public MeteorController(int maxCount, SpriteSheetHandler handler,string basePath,float averageMeteorsPerMinute,
             Vector2 maxVelocity,Vector2 minVelocity, Point normalMeteorFrameRange, Point undestructibleMeteorFrameRange){

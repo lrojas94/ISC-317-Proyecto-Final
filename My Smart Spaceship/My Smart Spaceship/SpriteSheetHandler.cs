@@ -106,11 +106,12 @@ namespace My_Smart_Spaceship
             SpriteData spr = spriteSheetData[path[0]][path[1]];
             spr.Draw(spriteBatch, spriteSheet, position, rotation,scale,effects);
         }
+        
 
         #endregion
         #region AnimationHandling
-        public Animator AnimatorWithAnimation(string animationName) {
-            return new Animator(animations[animationName], this);
+        public Animator AnimatorWithAnimation(string animationName,bool shouldLoop = true) {
+            return new Animator(animations[animationName], this,shouldLoop);
         }
         #endregion
     }

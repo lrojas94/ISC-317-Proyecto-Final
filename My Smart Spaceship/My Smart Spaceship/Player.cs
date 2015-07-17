@@ -34,7 +34,13 @@ namespace My_Smart_Spaceship
                 return handler.SpriteRectangle(spritePath,position,scale);
             }
         }
-       
+
+        public List<Bullet> Bullets {
+            get {
+                return activeBullets;
+            }
+        }
+
         public Player(SpriteSheetHandler handler, string spritePath,Vector2 playerSpeed) {
             this.handler = handler;
             this.spritePath = spritePath;

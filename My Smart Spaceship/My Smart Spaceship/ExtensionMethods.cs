@@ -26,6 +26,13 @@ namespace My_Smart_Spaceship
             return position;
         }
 
+        public static Rectangle OriginCenter(this Rectangle r) {
+            r.X = r.X - r.Width / 2;
+            r.Y = r.Y - r.Height / 2;
+            return r;
+        }
+        
+
         public static bool OutOfGameBounds(this Rectangle spriteRectangle) {
             Rectangle mainFrame = new Rectangle(0, 0, MainGame.Instance.ScreenWidth, MainGame.Instance.ScreenHeight);
             return !mainFrame.Contains(spriteRectangle);

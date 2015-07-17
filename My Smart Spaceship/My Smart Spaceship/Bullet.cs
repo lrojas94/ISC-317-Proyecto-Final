@@ -33,6 +33,7 @@ namespace My_Smart_Spaceship
                 return isActive;
             }
         }
+        
 
         public Rectangle Rectangle {
             get {
@@ -47,12 +48,19 @@ namespace My_Smart_Spaceship
                 }
             }
         }
+        
+        public bool CanCollide {
+            get {
+                return state == BulletStates.Moving;
+            }
+        }
+
         public Bullet(SpriteSheetHandler handler,Vector2 velocity,float scale = 1.0f)
         {
             this.velocity = velocity;
             this.scale = scale;
             movingAnimation = handler.AnimatorWithAnimation("BlueBullet_Move");
-            explodeAnimation = handler.AnimatorWithAnimation("BlueBullet_Explode");
+            explodeAnimation = handler.AnimatorWithAnimation("BlueBullet_Explode",false);
         }
 
         public void StartBullet(Vector2 position) {
@@ -61,6 +69,10 @@ namespace My_Smart_Spaceship
             state = BulletStates.Moving;
             movingAnimation.Reset();
             explodeAnimation.Reset();
+        }
+
+        public void Explode() {
+            state = BulletStates.Exploding;
         }
 
         public void Update(GameTime gameTime) {
@@ -98,7 +110,7 @@ namespace My_Smart_Spaceship
                     case BulletStates.Exploding:
                         explodeAnimation.Draw(spriteBatch, position,scale);
                         break;
-                    case BulletStates.Inactive:
+                    default:
                         break;
                 }
             }

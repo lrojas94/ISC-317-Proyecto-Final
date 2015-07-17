@@ -38,4 +38,80 @@
       <spr name="/BlueBulletExplosion/3" x="1" y="0" z="0"/>
     </cell>
   </anim>
+  <anim name="Effect_Shield" loops="0">
+    <cell index="0" delay="3">
+      <spr name="/Effects/20" x="0" y="-13" z="0"/>
+    </cell>
+    <cell index="1" delay="3">
+      <spr name="/Effects/22" x="0" y="-9" z="0"/>
+    </cell>
+    <cell index="2" delay="3">
+      <spr name="/Effects/21" x="0" y="-18" z="0"/>
+    </cell>
+    <cell index="3" delay="3">
+      <spr name="/Effects/22" x="0" y="-9" z="0"/>
+    </cell>
+  </anim>
+  <anim name="Effect_Star" loops="0">
+    <cell index="0" delay="5">
+      <spr name="/Effects/24" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="1" delay="5">
+      <spr name="/Effects/25" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="2" delay="5">
+      <spr name="/Effects/26" x="0" y="0" z="0"/>
+    </cell>
+  </anim>
+  <anim name="Effect_Shot" loops="0">
+    <cell index="0" delay="5">
+      <spr name="/Effects/1" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="1" delay="5">
+      <spr name="/Effects/2" x="0" y="1" z="0"/>
+    </cell>
+    <cell index="2" delay="5">
+      <spr name="/Effects/3" x="0" y="0" z="0"/>
+    </cell>
+  </anim>
+  <anim name="Effect_Shot2" loops="0">
+    <cell index="0" delay="5">
+      <spr name="/Effects/18" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="1" delay="5">
+      <spr name="/Effects/19" x="0" y="0" z="0"/>
+    </cell>
+  </anim>
+  <anim name="Meteor_Explosion" loops="0">
+    <cell index="0" delay="3">
+      <spr name="/Effects/30" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="1" delay="3">
+      <spr name="/Effects/27" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="2" delay="3">
+      <spr name="/Effects/29" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="3" delay="3">
+      <spr name="/Effects/31" x="0" y="-26" z="0"/>
+    </cell>
+    <cell index="4" delay="3">
+      <spr name="/Effects/32" x="2" y="-24" z="0"/>
+    </cell>
+    <cell index="5" delay="3">
+      <spr name="/Effects/33" x="4" y="-24" z="0"/>
+    </cell>
+    <cell index="6" delay="3">
+      <spr name="/Effects/34" x="6" y="-50" z="0"/>
+    </cell>
+    <cell index="7" delay="3">
+      <spr name="/Effects/35" x="5" y="-34" z="0"/>
+    </cell>
+    <cell index="8" delay="3">
+      <spr name="/Effects/36" x="11" y="-30" z="0"/>
+    </cell>
+    <cell index="9" delay="3">
+      <spr name="/Effects/28" x="4" y="-11" z="0"/>
+    </cell>
+  </anim>
 </animations>
