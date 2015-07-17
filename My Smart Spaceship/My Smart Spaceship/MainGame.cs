@@ -21,6 +21,7 @@ namespace My_Smart_Spaceship
         public int ScreenHeight = 600;
         public int ScreenWidth = 800;
         public SpriteSheetHandler SpriteSheetHandler;
+        
 
         private static MainGame instance;
         public static MainGame Instance
@@ -40,7 +41,7 @@ namespace My_Smart_Spaceship
         Player player;
         COM com;
         //Meteors List
-        List<Meteors> meteorsList = new List<Meteors>();
+        MeteorController meteorController;
 
         Random random = new Random();
         public MainGame()
@@ -78,6 +79,8 @@ namespace My_Smart_Spaceship
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
             player = new Player(this.SpriteSheetHandler,@"Players/playerA_Blue", new Vector2(500,500));
             player.GenerateBullets(SpriteSheetHandler);
+            meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",300f,
+                new Vector2(300, 100),new Vector2(100,50), new Point(0, 9), new Point(10, 19));
             //com = new COM(Content.Load<Texture2D>("com.png"), new Vector2(280, 280));
             // TODO: use this.Content to load your game content here
         }
@@ -102,14 +105,43 @@ namespace My_Smart_Spaceship
                 Exit();
             // TODO: Add your update logic here
             background.Update(gameTime);
+            meteorController.Update(gameTime);
             player.Update(gameTime);
-            //For each meteor in meteorList
-            foreach (Meteors m in meteorsList)
-            {
-                m.Update(gameTime);
+
+            #region Collisions
+            //PlayerBullets and Asteroids:
+            List<Bullet> playerBullets = player.Bullets;
+            List<Meteors> meteors = meteorController.Meteors;
+            foreach (Bullet b in playerBullets){
+                if (b.CanCollide) {
+                    foreach (Meteors m in meteors){
+                        if (m.CanCollide){
+                            if (b.Rectangle.Intersects(m.Rectangle)){
+                                b.Explode();
+                                if (!m.IsUndestructible)
+                                    m.Explode();
+                            }
+                        }
+                    }
+                }
             }
 
-            LoadMeteors();
+            if (player.CanCollide) {
+                foreach (Meteors m in meteors)
+                {
+                    if (m.CanCollide && m.Rectangle.Intersects(player.Rectangle))
+                    {
+                        player.KillPlayer();
+                        break;
+                    }
+                }
+            }
+            
+
+            #endregion
+
+            //For each meteor in meteorList
+
 
             base.Update(gameTime);
         }
@@ -118,45 +150,29 @@ namespace My_Smart_Spaceship
         /// This is called when the game should draw itself.
         /// </summary>
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// 
+
+
+        public void DrawColor(Color c, Rectangle r) {
+            Texture2D t = new Texture2D(GraphicsDevice, 1, 1,false,SurfaceFormat.Color);
+            t.SetData<Color>(new Color[] { c });
+            spriteBatch.Draw(t, r, Color.White);
+        }
+
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
             background.Draw(gameTime,spriteBatch);
-            player.Draw(gameTime,spriteBatch);
-
-            foreach (Meteors m in meteorsList)
-            {
-                m.Draw(gameTime,spriteBatch);
-            }
+            meteorController.Draw(spriteBatch);
+            player.Draw(spriteBatch);
+          
             spriteBatch.End();
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
         }
-
-        //Load Meteors
-        public void LoadMeteors()
-        {
-            //Creating random X and Y for the meteors
-            int randY = random.Next(-600, -50);
-            int randX = random.Next(0, 750);
-
-            //To make sure we have more than 5 meteors on the screen
-            if (meteorsList.Count() < 5)
-            {
-                meteorsList.Add(new Meteors(SpriteSheetHandler,@"Meteors/0"));
-            }
-            //Remove is meteor was destroyed
-            for (int i = 0; i < meteorsList.Count; i++)
-            {
-                if (!meteorsList[i].IsVisible)
-                {
-                    meteorsList.RemoveAt(i);
-                    i--;
-                }
-            }
-        }
+        
     }
 }
