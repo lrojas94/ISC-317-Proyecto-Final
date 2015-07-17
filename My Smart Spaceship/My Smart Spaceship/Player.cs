@@ -102,18 +102,20 @@ namespace My_Smart_Spaceship
                         position.Y += playerSpeed.Y * delta;
 
                     position = position.KeepInGameFrame(spriteBounds);
+
+                    // If alive can shoot
+                    if (Keyboard.GetState().IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space))
+                    {
+                        //Shot a bullet.
+                        Bullet b = inactiveBullets.Pop();
+                        b.StartBullet(position);
+                        activeBullets.Add(b);
+                    }
+
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);
                     break;
-            }
-
-            //Check for shots:
-            if (Keyboard.GetState().IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space)) {
-                //Shot a bullet.
-                Bullet b = inactiveBullets.Pop();
-                b.StartBullet(position);
-                activeBullets.Add(b);
             }
 
             //Check Active bullets:

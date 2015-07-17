@@ -39,7 +39,7 @@ namespace My_Smart_Spaceship
         SpriteBatch spriteBatch;
         Background background;
         Player player;
-        COM com;
+        //COM com;
         //Meteors List
         MeteorController meteorController;
 

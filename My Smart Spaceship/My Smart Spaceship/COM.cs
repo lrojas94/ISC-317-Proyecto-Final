@@ -91,7 +91,7 @@ namespace My_Smart_Spaceship
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
             foreach (Bullet b in activeBullets)
-                b.Draw(gameTime, spriteBatch);
+                b.Draw(spriteBatch);
             handler.DrawSprite(spriteBatch, position, spritePath, scale);
         }
 

@@ -22,7 +22,6 @@ namespace My_Smart_Spaceship
         private BulletStates state = BulletStates.Inactive;
         private Vector2 position;
         private Vector2 velocity;
-        private bool shouldMove = true;
         private bool isActive = false;
         private Animator movingAnimation;
         private Animator explodeAnimation;
