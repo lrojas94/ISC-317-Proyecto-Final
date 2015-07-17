@@ -9,39 +9,97 @@ namespace My_Smart_Spaceship
 {
 	class COM
 	{
-        Texture2D sprite;
-        Vector2 position;
-        Vector2 playerSpeed;
+        private string spritePath;
+        private float scale = 0.5f;
+        private Vector2 position;
+        private Vector2 playerSpeed;
+        private Vector2 shootingVelocity;
+        private Stack<Bullet> inactiveBullets = new Stack<Bullet>();
+        private List<Bullet> activeBullets = new List<Bullet>();
+        private SpriteSheetHandler handler;
        
-        public COM(Texture2D sprite,Vector2 playerSpeed) {
-            this.sprite = sprite;
+        public COM(SpriteSheetHandler handler, string spritePath, Vector2 playerSpeed) {
+            this.handler = handler;
+            this.spritePath = spritePath;
             this.playerSpeed = playerSpeed;
-            position = new Vector2(MainGame.Instance.ScreenWidth / 2 - sprite.Width / 2, 0);
+            shootingVelocity = new Vector2(0, -1.5f * playerSpeed.Y);
+
+            position = new Vector2(MainGame.Instance.ScreenWidth / 2, 1.5f * handler.SpriteRectangle(spritePath, Vector2.Zero, scale).Height);
         }
 
-        public void Update(GameTime gameTime) {
-            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+        public float Scale{
+            get{
+                return scale;
+            }
+            set{
+                scale = value; 
+            }
+        }
 
-            if (position.X < 0)
-                position.X = 0;
-            if (position.X + sprite.Width > MainGame.Instance.ScreenWidth)
-                position.X = MainGame.Instance.ScreenWidth - sprite.Width;
-            if (position.Y < 0)
-                position.Y = 0;
-            if (position.Y + sprite.Height > MainGame.Instance.ScreenHeight)
-                position.Y = MainGame.Instance.ScreenHeight - sprite.Height;
+        public Rectangle Rectangle
+        {
+            get
+            {
+                return handler.SpriteRectangle(spritePath, position, scale);
+            }
+        }
+
+        public void Update(GameTime gameTime)
+        {
+            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            bool shoot = false;
+
+            /* Movement handling
+             * Algoritmo para moverse basado en los objetos contenidos en un rectangulo alrededor de la IA y las 
+             * consideraciones de cuales de ellos son peligrosos o son beneficiosos.
+             * */
+  
+            position.KeepInGameFrame(handler.SpriteRectangle(spritePath, position, scale));
+
+            /* Bullet handling
+             * Si hay objetos a los que se les puede disparar en el rango de tiro, se les disparara ...
+             * */
+
+            //Check for shots:
+            if (shoot == true)
+            {
+                //Shot a bullet.
+                Bullet b = inactiveBullets.Pop();
+                b.StartBullet(position);
+                activeBullets.Add(b);
+            }
+
+            //Check Active bullets:
+            for (int i = 0; i < activeBullets.Count; i++)
+            {
+                activeBullets[i].Update(gameTime);
+                if (!activeBullets[i].IsActive){
+                    Bullet b = activeBullets[i];
+                    activeBullets.RemoveAt(i);
+                    inactiveBullets.Push(b);
+                    i--;
+                }
+            }
+        }
+
+        public void GenerateBullets(SpriteSheetHandler handler, int count = 100){
+            for (int i = 0; i < count; i++){
+                Bullet b = new Bullet(handler, shootingVelocity, scale);
+                inactiveBullets.Push(b);
+            }
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch) {
-            spriteBatch.Draw(sprite, position, Color.White);
+            foreach (Bullet b in activeBullets)
+                b.Draw(gameTime, spriteBatch);
+            handler.DrawSprite(spriteBatch, position, spritePath, scale);
         }
 
-        // Este metodo sera la abstraccion entre C# y prolog para las consultas'
-        // con la base de conocimiento de la IA.
-        private void IAlogic()
+        /* Devuleve una lista de objetos que estan en el rango de disparo de la IA */
+        private List<Object> shootRange()
         {
 
-
+            return null;
         }
 	}
 }
