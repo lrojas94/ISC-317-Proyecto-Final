@@ -54,7 +54,7 @@ namespace My_Smart_Spaceship
             this.handler = handler;
             this.spritePath = spritePath;
             isActive = true;
-            explodeAnimation = handler.AnimatorWithAnimation("Meteor_Explosion", false);
+            explodeAnimation = handler.AnimatorWithAnimation("Explosion", false);
         }
 
         public void Start(Vector2 position, Vector2 velocity,bool isUndestructible = false, string spritePath = null) {

@@ -44,7 +44,10 @@ namespace My_Smart_Spaceship
                     if (shouldLoop)
                         currentFrame %= animation.Count;
                     else
+                    {
                         isDone = true;
+                        currentFrame = animation.Count - 1;
+                    }
                 }
             }
         }

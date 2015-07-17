@@ -10,6 +10,10 @@ namespace My_Smart_Spaceship
 {
     class Player
     {
+        private enum PlayerStates {
+            Alive,Dead
+        }
+
         private string spritePath;
         private Vector2 position;
         private Vector2 playerSpeed;
@@ -19,13 +23,22 @@ namespace My_Smart_Spaceship
         private List<Bullet> activeBullets = new List<Bullet>();
         private SpriteSheetHandler handler;
         private KeyboardState prevKeyboardState = Keyboard.GetState();
-        
+        private Animator explosionAnimation;
+        private PlayerStates state = PlayerStates.Alive;
+        private float animationScale;
+
         public float Scale {
             get{
                 return scale;
             }
             set {
                 scale = value;
+            }
+        }
+
+        public bool CanCollide {
+            get {
+                return state == PlayerStates.Alive;
             }
         }
         
@@ -49,6 +62,10 @@ namespace My_Smart_Spaceship
             shootingVelocity.X = 0;
             Rectangle sprite = handler.SpriteRectangle(spritePath,Vector2.Zero,scale);
             position = new Vector2(MainGame.Instance.ScreenWidth / 2, MainGame.Instance.ScreenHeight - sprite.Height/2);
+            explosionAnimation = handler.AnimatorWithAnimation("Explosion",false);
+            
+            Vector2 scaleFactor = Rectangle.Size.ToVector2() / explosionAnimation.CurrentFrameRectangle(position).Size.ToVector2();
+            animationScale = Math.Min(scaleFactor.X, scaleFactor.Y);
         }
 
         public void GenerateBullets(SpriteSheetHandler handler,int count = 100) {
@@ -58,27 +75,38 @@ namespace My_Smart_Spaceship
             }
         }
 
+        public void KillPlayer() {
+            state = PlayerStates.Dead;
+        }
+
 
         public void Update(GameTime gameTime) {
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Rectangle spriteBounds = handler.SpriteRectangle(spritePath,position,scale);
+            switch (state) {
+                case PlayerStates.Alive:
+                    Rectangle spriteBounds = Rectangle;
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Left) || Keyboard.GetState().IsKeyDown(Keys.A))
-                position.X += -1 * playerSpeed.X * delta;
-
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Right) || Keyboard.GetState().IsKeyDown(Keys.D))
-                position.X += playerSpeed.X * delta;
+                    if (Keyboard.GetState().IsKeyDown(Keys.Left) || Keyboard.GetState().IsKeyDown(Keys.A))
+                        position.X += -1 * playerSpeed.X * delta;
 
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Up) || Keyboard.GetState().IsKeyDown(Keys.W))
-                position.Y += -1 * playerSpeed.Y * delta;
+                    if (Keyboard.GetState().IsKeyDown(Keys.Right) || Keyboard.GetState().IsKeyDown(Keys.D))
+                        position.X += playerSpeed.X * delta;
 
 
-            if (Keyboard.GetState().IsKeyDown(Keys.Down) || Keyboard.GetState().IsKeyDown(Keys.S))
-                position.Y += playerSpeed.Y * delta;
+                    if (Keyboard.GetState().IsKeyDown(Keys.Up) || Keyboard.GetState().IsKeyDown(Keys.W))
+                        position.Y += -1 * playerSpeed.Y * delta;
 
-            position = position.KeepInGameFrame(spriteBounds);
+
+                    if (Keyboard.GetState().IsKeyDown(Keys.Down) || Keyboard.GetState().IsKeyDown(Keys.S))
+                        position.Y += playerSpeed.Y * delta;
+
+                    position = position.KeepInGameFrame(spriteBounds);
+                    break;
+                case PlayerStates.Dead:
+                    explosionAnimation.Update(gameTime);
+                    break;
+            }
 
             //Check for shots:
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space)) {
@@ -106,7 +134,16 @@ namespace My_Smart_Spaceship
         public void Draw(SpriteBatch spriteBatch) {
             foreach (Bullet b in activeBullets)
                 b.Draw(spriteBatch);
-            handler.DrawSprite(spriteBatch, position, spritePath,scale);
+
+            switch (state) {
+                case PlayerStates.Alive:
+                    handler.DrawSprite(spriteBatch, position, spritePath, scale);
+                    break;
+                case PlayerStates.Dead:
+                    explosionAnimation.Draw(spriteBatch, position, animationScale);
+                    break;
+
+            }
         }
     }
 }

@@ -125,6 +125,17 @@ namespace My_Smart_Spaceship
                     }
                 }
             }
+
+            if (player.CanCollide) {
+                foreach (Meteors m in meteors)
+                {
+                    if (m.CanCollide && m.Rectangle.Intersects(player.Rectangle))
+                    {
+                        player.KillPlayer();
+                        break;
+                    }
+                }
+            }
             
 
             #endregion
