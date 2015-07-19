@@ -116,3 +116,9 @@ evento_valido(beneficia(_,_)):- !.
 evento_valido(perjudica(_,_)):- !.
 evento_valido( (EventoA, EventoB) ):-
 		evento_valido(EventoA), evento_valido(EventoB).
+
+% Listar todas los hechos asertados
+conocimiento():- vulnerable(_,_).
+conocimiento():- invulnerable(_,_).
+conocimiento():- mejora(_,_).
+conocimiento():- destruible(_).

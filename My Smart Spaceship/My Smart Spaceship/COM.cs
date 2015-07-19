@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SbsSW.SwiPlCs;
 
 namespace My_Smart_Spaceship
 {
@@ -55,16 +56,16 @@ namespace My_Smart_Spaceship
             string newCause = "";
             switch (cause.PossibleCause) {
                 case PossibleCauses.Impacts:
-                    newCause = String.Format("impacta({0},{1}).", cause.Stimulus, cause.TargetObject);
+                    newCause = String.Format("impacta({0},{1})", cause.Stimulus, cause.TargetObject);
                     break;
             }
             string newConsecuence = "";
             switch (consecuence.PossibleConsecuence) {
                 case PossibleConsecuences.Benefits:
-                    newConsecuence = String.Format("beneficia({0},{1}).", consecuence.Stimulus, consecuence.TargetObject);
+                    newConsecuence = String.Format("beneficia({0},{1})", consecuence.Stimulus, consecuence.TargetObject);
                     break;
                 case PossibleConsecuences.Damages:
-                    newConsecuence = String.Format("perjudica({0},{1}).", consecuence.Stimulus, consecuence.TargetObject);
+                    newConsecuence = String.Format("perjudica({0},{1})", consecuence.Stimulus, consecuence.TargetObject);
                     break;
                 case PossibleConsecuences.Ignores:
                     newConsecuence = String.Format("evento_nulo");
@@ -84,10 +85,27 @@ namespace My_Smart_Spaceship
 
         // Este metodo sera la abstraccion entre C# y prolog para las consultas'
         // con la base de conocimiento de la IA.
-        private void IAlogic()
+        public void dumpToFile(string filePath)
         {
+            
+            // Todas las reglas dinamicamente asertadas seran escritas en un archivo
+            //PlQuery.PlCall("percepcion( [evento(impacta(disparo(ia), humano) , perjudica(disparo(ia), humano))] )");
+            //PlQuery.PlCall("percepcion( [evento(impacta(asteroide, ia) , perjudica(asteroide, ia))] )");
+            //PlQuery.PlCall("percepcion( [evento(impacta(escudo, ia) , beneficia(escudo, ia))] )");
 
+            string query = "clause(conocimiento(), Hecho), Hecho.";
+            PlQuery q = new PlQuery(query);
 
+            string buffer = "";
+            foreach (PlQueryVariables qv in q.SolutionVariables)
+            {
+                buffer += (qv["Hecho"].ToString() + ".\n");
+            }
+
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(filePath, false);
+            sw.Write(buffer);
+            sw.Flush();
+            sw.Close();
         }
 	}
 }
