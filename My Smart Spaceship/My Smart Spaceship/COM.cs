@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SbsSW.SwiPlCs;
 
 namespace My_Smart_Spaceship
 {
@@ -87,16 +88,54 @@ namespace My_Smart_Spaceship
 
         private void addEvents() {
             string finalQuery = String.Format("percepcion([{0}])", string.Join(",", eventsOnHold));
+            
+            PlQuery.PlCall(finalQuery);
             eventsOnHold.Clear();
-            //CALL finalQuery in prolog :)          
         }
 
-        // Este metodo sera la abstraccion entre C# y prolog para las consultas'
-        // con la base de conocimiento de la IA.
-        private void IAlogic()
+        
+        public void loadFromFile(string filePath){
+
+            System.IO.StreamReader sr;
+
+            try{
+                sr = new System.IO.StreamReader(filePath);
+            }
+            catch (System.IO.FileNotFoundException){
+                return;
+            }
+
+            string[] fullKnowledge = sr.ReadToEnd().Split(new char[]{'\n'});
+
+            foreach(string fact in fullKnowledge) {
+                if (fact.Length == 0)   continue;
+
+                PlQuery.PlCall("assert(" + fact.Replace(".", "") + ").");
+            }
+
+            sr.Close();
+            sr.Dispose();
+        }
+
+        public void dumpToFile(string filePath)
         {
+            
+            // Todas las reglas dinamicamente asertadas seran escritas en un archivo
 
+            string query = "clause(conocimiento(), Hecho), Hecho.";
+            PlQuery q = new PlQuery(query);
 
+            string buffer = "";
+            foreach (PlQueryVariables qv in q.SolutionVariables)
+            {
+                buffer += (qv["Hecho"].ToString() + ".\n");
+            }
+
+            System.IO.StreamWriter sw = new System.IO.StreamWriter(filePath, false);
+            sw.Write(buffer);
+            sw.Flush();
+            sw.Close();
+            sw.Dispose();
         }
 	}
 }
