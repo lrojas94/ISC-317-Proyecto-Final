@@ -39,6 +39,11 @@ namespace My_Smart_Spaceship
         public void Update(GameTime gameTime)
         {
             //Update Code ^^
+            switch (state) {
+                case PlayerStates.Dead:
+                    explosionAnimation.Update(gameTime);
+                    break;
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch) {
@@ -47,6 +52,10 @@ namespace My_Smart_Spaceship
                 case PlayerStates.Alive:
                     handler.DrawSprite(spriteBatch, position, spritePath,0,scale,SpriteEffects.FlipVertically);
                     break;
+                case PlayerStates.Dead:
+                    explosionAnimation.Draw(spriteBatch, position, scale);
+                    break;
+
             }
             
         }
@@ -55,16 +64,16 @@ namespace My_Smart_Spaceship
             string newCause = "";
             switch (cause.PossibleCause) {
                 case PossibleCauses.Impacts:
-                    newCause = String.Format("impacta({0},{1}).", cause.Stimulus, cause.TargetObject);
+                    newCause = String.Format("impacta({0},{1})", cause.Stimulus, cause.TargetObject);
                     break;
             }
             string newConsecuence = "";
             switch (consecuence.PossibleConsecuence) {
                 case PossibleConsecuences.Benefits:
-                    newConsecuence = String.Format("beneficia({0},{1}).", consecuence.Stimulus, consecuence.TargetObject);
+                    newConsecuence = String.Format("beneficia({0},{1})", consecuence.Stimulus, consecuence.TargetObject);
                     break;
                 case PossibleConsecuences.Damages:
-                    newConsecuence = String.Format("perjudica({0},{1}).", consecuence.Stimulus, consecuence.TargetObject);
+                    newConsecuence = String.Format("perjudica({0},{1})", consecuence.Stimulus, consecuence.TargetObject);
                     break;
                 case PossibleConsecuences.Ignores:
                     newConsecuence = String.Format("evento_nulo");

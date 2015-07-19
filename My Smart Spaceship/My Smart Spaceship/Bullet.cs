@@ -62,6 +62,13 @@ namespace My_Smart_Spaceship
             explodeAnimation = handler.AnimatorWithAnimation("BlueBullet_Explode",false);
         }
 
+        public void ChangeAnimations(SpriteSheetHandler handler,string movingAnimationName = null, string explodeAnimationName = null) {
+            if (movingAnimationName != null)
+                movingAnimation = handler.AnimatorWithAnimation(movingAnimationName);
+            if (explodeAnimationName != null)
+                explodeAnimation = handler.AnimatorWithAnimation(explodeAnimationName);
+        }
+
         public void StartBullet(Vector2 position) {
             this.position = position;
             isActive = true;

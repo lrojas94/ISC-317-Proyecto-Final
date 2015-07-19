@@ -108,35 +108,67 @@ namespace My_Smart_Spaceship
             meteorController.Update(gameTime);
             player.Update(gameTime);
             com.Update(gameTime);
+
             #region Collisions
             //PlayerBullets and Asteroids:
             List<Bullet> playerBullets = player.Bullets;
+            List<Bullet> comBullets = com.Bullets;
             List<Meteors> meteors = meteorController.Meteors;
             foreach (Bullet b in playerBullets){
-                if (b.CanCollide) {
-                    foreach (Meteors m in meteors){
-                        if (m.CanCollide){
+                if (b.CanCollide) 
+                    foreach (Meteors m in meteors)
+                        if (m.CanCollide)
                             if (b.Rectangle.Intersects(m.Rectangle)){
                                 b.Explode();
                                 if (!m.IsUndestructible)
                                     m.Explode();
                             }
-                        }
-                    }
+                if (com.CanCollide && b.Rectangle.Intersects(com.Rectangle)){
+                    com.KillPlayer();
+                    com.AddEvent(new COM.Cause {
+                        PossibleCause = COM.PossibleCauses.Impacts,
+                        Stimulus = "disparo(humano)",
+                        TargetObject = "ia"
+                    }, new COM.Consecuence {
+                        PossibleConsecuence = COM.PossibleConsecuences.Damages,
+                        Stimulus = "disparo(humano)",
+                        TargetObject = "ia"
+                    });
                 }
+                
             }
 
-            if (player.CanCollide) {
-                foreach (Meteors m in meteors)
-                {
-                    if (m.CanCollide && m.Rectangle.Intersects(player.Rectangle))
-                    {
-                        player.KillPlayer();
-                        break;
-                    }
+            foreach (Meteors m in meteors)
+            {
+                if (!m.CanCollide)
+                    continue;
+                if (player.CanCollide && m.Rectangle.Intersects(player.Rectangle)) {
+                    player.KillPlayer();
+
                 }
+                if (com.CanCollide && m.Rectangle.Intersects(com.Rectangle)) {
+                    com.KillPlayer();
+                    com.AddEvent(
+                        new COM.Cause
+                        {
+                            PossibleCause = COM.PossibleCauses.Impacts,
+                            Stimulus = "asteroide",
+                            TargetObject = "ia"
+                        },
+                        new COM.Consecuence
+                        {
+                            PossibleConsecuence = COM.PossibleConsecuences.Damages,
+                            Stimulus = "asteroide",
+                            TargetObject = "ia"
+                        }
+                        );
+                }
+
+
+
+
             }
-            
+
 
             #endregion
 
@@ -174,6 +206,11 @@ namespace My_Smart_Spaceship
 
             base.Draw(gameTime);
         }
-        
+
+        protected override void OnExiting(object sender, EventArgs args)
+        {
+            base.OnExiting(sender, args);
+        }
+
     }
 }
