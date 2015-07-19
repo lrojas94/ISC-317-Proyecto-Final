@@ -96,7 +96,7 @@ aprendizaje( evento(impacta(Estimulo, Objeto), evento_nulo) ):-
 % La regla percepcion se encarga de recibir los "eventos" que suceden
 % desde el codigo C# y aprende de lo que acontece alrededor de la nave de la IA.
 
-percepcion([evento(Causa, Consecuencia)]):- 
+percepcion([evento(Causa, Consecuencia)]):-
 	evento_valido(Causa), evento_valido(Consecuencia),
 	aprendizaje(evento(Causa, Consecuencia)), !.
 percepcion([evento(Causa, Consecuencia)|EventosRestantes]):-
