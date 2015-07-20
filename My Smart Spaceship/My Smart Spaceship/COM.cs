@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+
+using Microsoft.Xna.Framework.Input;
 using SbsSW.SwiPlCs;
 
 namespace My_Smart_Spaceship
@@ -34,21 +36,49 @@ namespace My_Smart_Spaceship
             base(handler,spritePath, playerSpeed) {
             Rectangle sprite = Rectangle;
             position = new Vector2(MainGame.Instance.ScreenWidth / 2,sprite.Height / 2); //Set COM at top.
-
+            shootingVelocity.Y = Math.Abs(shootingVelocity.Y); //So that bullets go down.
         }
 
-        public void Update(GameTime gameTime)
+        public new void GenerateBullets(SpriteSheetHandler handler, int count = 100)
+        {
+            base.GenerateBullets(handler, count);
+            foreach (Bullet b in inactiveBullets)
+                b.ChangeAnimations(handler, "Bullet_Red_Move", "Bullet_Red_Explode");
+        }
+
+        public new void Update(GameTime gameTime)
         {
             //Update Code ^^
             switch (state) {
+                case PlayerStates.Alive:
+                    if (Keyboard.GetState().IsKeyDown(Keys.X))
+                    {
+                        shoot();
+                    }
+                    break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);
                     break;
             }
+
+            for (int i = 0; i < activeBullets.Count; i++)
+            {
+                activeBullets[i].Update(gameTime);
+                if (!activeBullets[i].IsActive)
+                {
+                    Bullet b = activeBullets[i];
+                    activeBullets.RemoveAt(i);
+                    inactiveBullets.Push(b);
+                    i--;
+                }
+            }
         }
 
-        public void Draw(SpriteBatch spriteBatch) {
+        public new void Draw(SpriteBatch spriteBatch) {
             //Drawing Code.
+            foreach (Bullet b in activeBullets)
+                b.Draw(spriteBatch);
+
             switch (state) {
                 case PlayerStates.Alive:
                     handler.DrawSprite(spriteBatch, position, spritePath,0,scale,SpriteEffects.FlipVertically);

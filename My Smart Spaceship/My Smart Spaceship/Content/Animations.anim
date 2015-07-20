@@ -126,4 +126,41 @@
       <spr name="/Effects/32" x="0" y="0" z="0"/>
     </cell>
   </anim>
+  <anim name="Bullet_Red_Explode" loops="0">
+    <cell index="0" delay="3">
+      <spr name="/RedBulletExplosion/0" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="1" delay="3">
+      <spr name="/RedBulletExplosion/1" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="2" delay="3">
+      <spr name="/RedBulletExplosion/2" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="3" delay="3">
+      <spr name="/RedBulletExplosion/3" x="0" y="-1" z="0"/>
+    </cell>
+  </anim>
+  <anim name="Bullet_Red_Move" loops="0">
+    <cell index="0" delay="3">
+      <spr name="/RedBullet/0" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="1" delay="3">
+      <spr name="/RedBullet/1" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="2" delay="3">
+      <spr name="/RedBullet/3" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="3" delay="3">
+      <spr name="/RedBullet/2" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="4" delay="3">
+      <spr name="/RedBullet/4" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="5" delay="3">
+      <spr name="/RedBullet/5" x="0" y="0" z="0"/>
+    </cell>
+    <cell index="6" delay="3">
+      <spr name="/RedBullet/6" x="0" y="0" z="0"/>
+    </cell>
+  </anim>
 </animations>

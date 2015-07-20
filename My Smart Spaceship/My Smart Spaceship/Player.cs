@@ -79,6 +79,11 @@ namespace My_Smart_Spaceship
             state = PlayerStates.Dead;
         }
 
+        protected void shoot() {
+            Bullet b = inactiveBullets.Pop();
+            b.StartBullet(position);
+            activeBullets.Add(b);
+        }
 
         public void Update(GameTime gameTime) {
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -105,12 +110,7 @@ namespace My_Smart_Spaceship
 
                     // If alive can shoot
                     if (Keyboard.GetState().IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space))
-                    {
-                        //Shot a bullet.
-                        Bullet b = inactiveBullets.Pop();
-                        b.StartBullet(position);
-                        activeBullets.Add(b);
-                    }
+                        shoot();
 
                     break;
                 case PlayerStates.Dead:

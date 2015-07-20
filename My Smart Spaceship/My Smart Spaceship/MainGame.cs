@@ -80,13 +80,12 @@ namespace My_Smart_Spaceship
             player = new Player(this.SpriteSheetHandler,@"Players/playerA_Blue", new Vector2(500,500));
             player.GenerateBullets(SpriteSheetHandler);
             com = new COM(this.SpriteSheetHandler, @"Players/playerC_Mix", new Vector2(500, 500));
+            com.GenerateBullets(SpriteSheetHandler);
             meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",60f,
                 new Vector2(300, 100),new Vector2(100,50), new Point(0, 9), new Point(10, 19));
 
-            if (!PlEngine.IsInitialized) 
-            {
+            if (!PlEngine.IsInitialized)
                 PlEngine.Initialize(new string[]{"-q","AI.pl"});
-            }
         }
 
         /// <summary>
