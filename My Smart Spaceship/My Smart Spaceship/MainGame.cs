@@ -159,6 +159,31 @@ namespace My_Smart_Spaceship
             foreach (Bullet b in comBullets)
             {
                 if (b.CanCollide)
+
+                    foreach (Bullet hb in playerBullets)
+                    {
+                        if (hb.CanCollide)
+                        {
+                            if (b.Rectangle.Contains(hb.Rectangle))
+                            {
+                                hb.Explode();
+                                b.Explode();
+                                com.AddEvent(new COM.Cause
+                                {
+                                    PossibleCause = COM.PossibleCauses.Impacts,
+                                    Stimulus = "disparo(ia)",
+                                    TargetObject = "disparo(humano)"
+                                }, new COM.Consecuence
+                                {
+                                    PossibleConsecuence = COM.PossibleConsecuences.Damages,
+                                    Stimulus = "disparo(ia)",
+                                    TargetObject = "disparo(humano)"
+                                });
+                                break;
+                            }
+                        }
+                    }
+
                     foreach (Meteors m in meteors)
                         if (m.CanCollide)
                             if (b.Rectangle.Intersects(m.Rectangle))
@@ -212,7 +237,6 @@ namespace My_Smart_Spaceship
                         TargetObject = "humano"
                     });
                 }
-
             }
 
             query = new PlQuery("mover(asteroide, Veredicto).");

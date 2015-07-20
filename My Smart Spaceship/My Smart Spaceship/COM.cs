@@ -51,15 +51,18 @@ namespace My_Smart_Spaceship
 
         public void Update(GameTime gameTime, List<Tuple<Vector2, string>> actions = null)
         {
-            if (counter < 1) counter++;
-            else{
-                addEvents();
+            if(counter > 30){
+                //addEvents();
                 counter = 0;
             }
+            else
+                counter++;
 
             //Update Code ^^
             switch (state) {
                 case PlayerStates.Alive:
+                    if(counter > 29)
+                        shoot();
                     mover(gameTime, actions);
                     position = position.KeepInGameFrame(Rectangle);
                     break;
@@ -215,6 +218,15 @@ namespace My_Smart_Spaceship
             newDirection.Normalize();
             newDirection *= playerSpeed.Length() * delta;
             position += newDirection;
+        }
+
+        public Rectangle fireRange(){
+            Point end = new Point(Rectangle.Width, MainGame.Instance.ScreenHeight);
+            Point origin = position.ToPoint();
+            origin.X -= Rectangle.Width / 2;
+            origin.Y -= Rectangle.Height / 2;
+
+            return new Rectangle(origin, end);
         }
 	}
 }

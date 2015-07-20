@@ -64,7 +64,7 @@ namespace My_Smart_Spaceship
             this.handler = handler;
             this.spritePath = spritePath;
             this.playerSpeed = playerSpeed;
-            shootingVelocity = -playerSpeed * 1.5f;
+            shootingVelocity = -playerSpeed * 0.1f;
             shootingVelocity.X = 0;
             Rectangle sprite = handler.SpriteRectangle(spritePath,Vector2.Zero,scale);
             position = new Vector2(MainGame.Instance.ScreenWidth / 2, MainGame.Instance.ScreenHeight - sprite.Height/2);
