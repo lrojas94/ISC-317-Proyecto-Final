@@ -66,7 +66,7 @@ namespace My_Smart_Spaceship
             if (movingAnimationName != null)
                 movingAnimation = handler.AnimatorWithAnimation(movingAnimationName);
             if (explodeAnimationName != null)
-                explodeAnimation = handler.AnimatorWithAnimation(explodeAnimationName);
+                explodeAnimation = handler.AnimatorWithAnimation(explodeAnimationName,false);
         }
 
         public void StartBullet(Vector2 position) {

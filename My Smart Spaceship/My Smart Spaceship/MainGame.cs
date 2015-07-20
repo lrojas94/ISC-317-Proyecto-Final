@@ -127,6 +127,7 @@ namespace My_Smart_Spaceship
                                     m.Explode();
                             }
                 if (com.CanCollide && b.Rectangle.Intersects(com.Rectangle)){
+                    b.Explode();
                     com.KillPlayer();
                     com.AddEvent(new COM.Cause {
                         PossibleCause = COM.PossibleCauses.Impacts,
@@ -139,6 +140,65 @@ namespace My_Smart_Spaceship
                     });
                 }
                 
+            }
+
+            foreach (Bullet b in comBullets)
+            {
+                if (b.CanCollide)
+                    foreach (Meteors m in meteors)
+                        if (m.CanCollide)
+                            if (b.Rectangle.Intersects(m.Rectangle))
+                            {
+                                b.Explode();
+                                if (!m.IsUndestructible)
+                                {
+                                    m.Explode();
+                                    com.AddEvent(
+                                        new COM.Cause
+                                        {
+                                            PossibleCause = COM.PossibleCauses.Impacts,
+                                            Stimulus = "disparo(ia)",
+                                            TargetObject = "asteroide"
+                                        },
+                                        new COM.Consecuence
+                                        {
+                                            PossibleConsecuence = COM.PossibleConsecuences.Damages,
+                                            Stimulus = "disparo(ia)",
+                                            TargetObject = "asteroide"
+                                        });
+                                }
+                                else
+                                    com.AddEvent(
+                                        new COM.Cause
+                                        {
+                                            PossibleCause = COM.PossibleCauses.Impacts,
+                                            Stimulus = "disparo(ia)",
+                                            TargetObject = "asteroide_gris"
+                                        },
+                                        new COM.Consecuence
+                                        {
+                                            PossibleConsecuence = COM.PossibleConsecuences.Ignores,
+                                            Stimulus = "disparo(ia)",
+                                            TargetObject = "asteroide_gris"
+                                        });
+                            }
+                if (player.CanCollide && b.Rectangle.Intersects(player.Rectangle))
+                {
+                    b.Explode();
+                    player.KillPlayer();
+                    com.AddEvent(new COM.Cause
+                    {
+                        PossibleCause = COM.PossibleCauses.Impacts,
+                        Stimulus = "disparo(ia)",
+                        TargetObject = "humano"
+                    }, new COM.Consecuence
+                    {
+                        PossibleConsecuence = COM.PossibleConsecuences.Damages,
+                        Stimulus = "disparo(ia)",
+                        TargetObject = "humano"
+                    });
+                }
+
             }
 
             foreach (Meteors m in meteors)
