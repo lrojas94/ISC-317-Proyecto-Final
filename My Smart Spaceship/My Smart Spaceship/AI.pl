@@ -23,16 +23,11 @@ disparar(Objeto):- invulnerable(disparo(ia), Objeto), !, fail.
 disparar(Objeto):- util(Objeto, ia), !, fail.
 disparar(_):- !.
 
-% La regla mover toma una lista de objetos que estan cerca de la IA
+% La regla mover toma un objeto que este cerca de la IA
 % (la cercania) se decide en el código en C#.
-mover([], []):- !.
-mover([], _):- !.
-mover([Objeto|ListaObjetosCercanos], Acciones):-
-		alejar(Objeto), mover(ListaObjetosCercanos, L), Acciones=[alejar|L],!.
-mover([Objeto|ListaObjetosCercanos], Acciones):-
-		acercar(Objeto), mover(ListaObjetosCercanos, L), Acciones=[acercar|L],!.
-mover([_|ListaObjetosCercanos], Acciones):-
-		mover(ListaObjetosCercanos, L), Acciones = [quedarse_quieto|L], !.
+mover(Objeto, alejar):-	alejar(Objeto), !.
+mover(Objeto, acercar):- acercar(Objeto), !.
+mover(_, quedarse_quieto):- !.
 
 % Objetos considerados como upgrades de artilleria.
 arma(Objeto, ia):- mejora(Objeto, armamento_ia), !.
@@ -53,11 +48,10 @@ aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):-
 aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):-
 		invulnerable(Estimulo, Objeto), retract(invulnerable(Estimulo, Objeto)), fail.
 aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):-
-		vulnerable(Estimulo, Objeto), !.
+		not(vulnerable(Estimulo, Objeto)), 
+		assertz(vulnerable(Estimulo, Objeto)), fail.
 aprendizaje( evento(impacta(Estimulo, Objeto), perjudica(Estimulo, Objeto)) ):-
-		assertz(vulnerable(Estimulo, Objeto)),
-		assertz(destruible(Objeto)), !.
-
+		not(destruible(Objeto)), assertz(destruible(Objeto)), !.
 
 % Que objetos llegan a explotar, es decir, pueden ser destruidos.
 aprendizaje( evento(impacta(Estimulo, Objeto), explota(Objeto)) ):-
