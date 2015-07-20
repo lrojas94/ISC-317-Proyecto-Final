@@ -43,6 +43,12 @@ namespace My_Smart_Spaceship
             }
         }        
 
+        public Vector2 Position{
+            get{
+                return position;
+            }
+        }
+
         public Rectangle Rectangle{
             get{
                 return handler.SpriteRectangle(spritePath, position);

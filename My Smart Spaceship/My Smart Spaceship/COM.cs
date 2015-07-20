@@ -10,6 +10,8 @@ namespace My_Smart_Spaceship
 {
 	class COM : Player
 	{
+        private int counter = 0;
+
         public enum PossibleCauses {
             Impacts
         }
@@ -37,17 +39,26 @@ namespace My_Smart_Spaceship
 
         }
 
-        public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime, List<Tuple<Vector2, string>> actions = null)
         {
+            if (counter < 30) counter++;
+            else{
+                addEvents();
+                counter = 0;
+            }
+
             //Update Code ^^
             switch (state) {
+                case PlayerStates.Alive:
+                    mover(actions);
+                    break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);
                     break;
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch) {
+        public new void Draw(SpriteBatch spriteBatch) {
             //Drawing Code.
             switch (state) {
                 case PlayerStates.Alive:
@@ -58,7 +69,6 @@ namespace My_Smart_Spaceship
                     break;
 
             }
-            
         }
 
         public void AddEvent(Cause cause, Consecuence consecuence) {
@@ -87,8 +97,10 @@ namespace My_Smart_Spaceship
         }
 
         private void addEvents() {
-            string finalQuery = String.Format("percepcion([{0}])", string.Join(",", eventsOnHold));
-            
+            string finalQuery = String.Format("percepcion([{0}]).", string.Join(",", eventsOnHold));
+
+            Console.Out.WriteLine(finalQuery);
+
             PlQuery.PlCall(finalQuery);
             eventsOnHold.Clear();
         }
@@ -136,6 +148,47 @@ namespace My_Smart_Spaceship
             sw.Flush();
             sw.Close();
             sw.Dispose();
+        }
+
+
+        public Rectangle actionRange(){
+            Vector2 finalDirection = Vector2.Zero;
+
+            Point fieldSize = new Point(this.Rectangle.Size.X*8, this.Rectangle.Size.Y*8);
+            Point fieldOrigin = new Point(this.Rectangle.Center.X - fieldSize.X/2, this.Rectangle.Center.Y - fieldSize.Y/2);
+            
+            return new Rectangle(fieldOrigin, fieldSize);
+        }
+
+        private void mover(List<Tuple<Vector2,string>> actions){
+            if (actions == null) return;
+
+            Vector2 newDirection = Vector2.Zero;
+            Vector2 tmp = Vector2.Zero;
+
+            foreach(Tuple<Vector2,string> o in actions){
+                if (o.Item2 == "quedarse_quieto")
+                    continue;
+
+                Console.Out.WriteLine(o.Item2);
+                tmp = (position - o.Item1);
+                tmp.Normalize();
+
+                if(o.Item2 == "alejar"){
+                    newDirection += tmp;
+                }
+                else if(o.Item2 == "acercar"){
+                    newDirection -= tmp;
+                }
+            }
+
+            if (newDirection == Vector2.Zero)
+                return;
+
+            newDirection.Normalize();
+            position += playerSpeed * newDirection;
+
+            //Console.Out.WriteLine(newDirection.X.ToString(), newDirection.Y.ToString());
         }
 	}
 }

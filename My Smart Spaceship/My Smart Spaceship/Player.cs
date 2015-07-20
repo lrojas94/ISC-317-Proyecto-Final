@@ -54,6 +54,12 @@ namespace My_Smart_Spaceship
             }
         }
 
+        public Vector2 Position{
+            get{
+                return position;
+            }
+        }
+
         public Player(SpriteSheetHandler handler, string spritePath,Vector2 playerSpeed) {
             this.handler = handler;
             this.spritePath = spritePath;
