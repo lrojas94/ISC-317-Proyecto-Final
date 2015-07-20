@@ -52,7 +52,7 @@ namespace My_Smart_Spaceship
         public void Update(GameTime gameTime, List<Tuple<Vector2, string>> actions = null)
         {
             if(counter > 30){
-                //addEvents();
+                addEvents();
                 counter = 0;
             }
             else
