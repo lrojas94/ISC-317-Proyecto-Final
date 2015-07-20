@@ -35,13 +35,14 @@ namespace My_Smart_Spaceship
         public COM(SpriteSheetHandler handler, string spritePath, Vector2 playerSpeed) :
             base(handler,spritePath, playerSpeed) {
             Rectangle sprite = Rectangle;
-            position = new Vector2(MainGame.Instance.ScreenWidth / 2,sprite.Height / 2); //Set COM at top.
+            //position = new Vector2(MainGame.Instance.ScreenWidth / 2,sprite.Height / 2); //Set COM at top.
+            position = new Vector2(MainGame.Instance.ScreenWidth / 2,MainGame.Instance.ScreenHeight / 2);
 
         }
 
         public void Update(GameTime gameTime, List<Tuple<Vector2, string>> actions = null)
         {
-            if (counter < 30) counter++;
+            if (counter < 1) counter++;
             else{
                 addEvents();
                 counter = 0;
@@ -50,7 +51,8 @@ namespace My_Smart_Spaceship
             //Update Code ^^
             switch (state) {
                 case PlayerStates.Alive:
-                    mover(actions);
+                    mover(gameTime, actions);
+                    position = position.KeepInGameFrame(Rectangle);
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);
@@ -160,9 +162,10 @@ namespace My_Smart_Spaceship
             return new Rectangle(fieldOrigin, fieldSize);
         }
 
-        private void mover(List<Tuple<Vector2,string>> actions){
+        private void mover(GameTime gameTime, List<Tuple<Vector2,string>> actions){
             if (actions == null) return;
 
+            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
             Vector2 newDirection = Vector2.Zero;
             Vector2 tmp = Vector2.Zero;
 
@@ -186,9 +189,8 @@ namespace My_Smart_Spaceship
                 return;
 
             newDirection.Normalize();
-            position += playerSpeed * newDirection;
-
-            //Console.Out.WriteLine(newDirection.X.ToString(), newDirection.Y.ToString());
+            newDirection *= playerSpeed.Length() * delta;
+            position += newDirection;
         }
 	}
 }
