@@ -7,32 +7,31 @@
 TODO:
 	# Graficos
 		[X] Fondo de estrellas en movimiento
-		[ ] Sprites para las naves, disparos, asteroides, explosiones, etc ...
+		[X] Sprites para las naves, disparos, asteroides, explosiones, etc ...
 		[ ] Sprites para las mejoras (power-ups) como escudos, disparo doble ...
 	
 	# Logica general
-	[ ] Aparicion y movimiento de asteroides
+	[X] Aparicion y movimiento de asteroides
 	[ ] Aparicion y movimiento de mejoras (power-ups)
-	[ ] Manejo de colisiones
-		[ ]	Disparos vs (asteroides, naves enemigas)
-		[ ] Naves vs Naves (Megaman fashion maybe)
+	[X] Manejo de colisiones
+		[X]	Disparos vs (asteroides, naves enemigas)
 	[ ] Manejo del ciclo principal y cambios persistentes
 		[ ] Reinicio del juego
-		[ ] Cierre del juego
-		[ ] Guardar muestras del "conocimiento" de la IA (assertions.pl ?)
+		[X] Cierre del juego
+		[X] Guardar muestras del "conocimiento" de la IA (assertions.pl ?)
 	
 	# IA
-	[ ] Implementar logica del IA
-		[ ] Objetos mortales para la IA
-		[ ] Objetos mortales para el jugador humano
-		[ ] Objetos destruibles por proyectiles
-		[ ] Objetos que ayudan a la IA
-		[ ] Objetos que ayudan a el jugador humano
-		[ ] Objetos que perjudican al IA en manos del jugador humano
-		[ ] Objetos que perjudican al jugador humano en manos del IA
-	[ ] Implementar movimiento del IA
-		[ ] Implementar regla para esquivar objetos peligrosos
-		[ ] Implementar regla para alcanzar objetos beneficiosos
+	[X] Implementar logica del IA
+		[X] Objetos mortales para la IA
+		[X] Objetos mortales para el jugador humano
+		[X] Objetos destruibles por proyectiles
+		[X] Objetos que ayudan a la IA
+		[X] Objetos que ayudan a el jugador humano
+		[X] Objetos que perjudican al IA en manos del jugador humano
+		[X] Objetos que perjudican al jugador humano en manos del IA
+	[X] Implementar movimiento del IA
+		[X] Implementar regla para esquivar objetos peligrosos
+		[X] Implementar regla para alcanzar objetos beneficiosos
 	
 	# Documento
 	[ ] Terminar el documento
