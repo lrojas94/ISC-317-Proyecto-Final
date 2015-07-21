@@ -214,13 +214,14 @@ namespace My_Smart_Spaceship
                     continue;
 
                 // Console.Out.WriteLine(action.Item2);
-                float distance = Vector2.DistanceSquared(moveTo, action.Item1.Center.ToVector2());
-                difference = (moveTo - action.Item1.Center.ToVector2()) * 2*screenWidth/distance; //Dividing by distance will farther from the closest one.
+                Vector2 pointFromRectBorder = this.pointFromRectBorder(moveTo, action.Item1);
+                float distance = Vector2.DistanceSquared(moveTo, pointFromRectBorder);
+                difference = (moveTo - pointFromRectBorder) * 2*screenWidth/distance; //Dividing by distance will farther from the closest one.
                 
                 //Console.WriteLine("Actual -> " + moveTo + " Item -> " + action.Item1.Center.ToVector2());
-                if (difference.Y == 0)
+                if (Math.Abs(difference.Y) < 2.0f)
                     difference.Y += (random.Next(0, 1) * 2 - 1) * Rectangle.Height;
-                if (difference.X == 0)
+                if (Math.Abs(difference.X) < 2.0f)
                     difference.X += (random.Next(0, 1)* 2 - 1) * Rectangle.Width;
               //  Console.WriteLine("Diferencia -> " + difference);
               //  Console.WriteLine("Actual a -> " + moveTo);
@@ -269,9 +270,26 @@ namespace My_Smart_Spaceship
             return false;
         }
 
+        private Vector2 pointFromRectBorder(Vector2 moveTo, Rectangle toAvoid) {
+
+            int X;
+            if (Math.Abs(moveTo.X - toAvoid.Left) < Math.Abs(moveTo.X - toAvoid.Right))
+                X = toAvoid.Left;
+            else
+                X = toAvoid.Right;
+            int Y;
+            if (Math.Abs(moveTo.Y - toAvoid.Top) < Math.Abs(moveTo.Y - toAvoid.Bottom))
+                Y = toAvoid.Top;
+            else
+                Y = toAvoid.Bottom;
+            return new Vector2(X, Y);
+
+
+        }
+
         private void goTo(Vector2 target,float delta) {
             float distance = Math.Abs(Vector2.Distance(position, target));
-            if (distance < 20f && goingToPoint)
+            if (distance <= 20f && goingToPoint)
             {
                 goingToPoint = false;
                 goingToStart = true;
