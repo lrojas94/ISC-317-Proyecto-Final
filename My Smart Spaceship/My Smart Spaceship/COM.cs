@@ -52,8 +52,8 @@ namespace My_Smart_Spaceship
             Rectangle sprite = Rectangle;
             random = new Random();
             //position = new Vector2(MainGame.Instance.ScreenWidth / 2,sprite.Height / 2); //Set COM at top.
-            position = new Vector2(MainGame.Instance.ScreenWidth / 2,MainGame.Instance.ScreenHeight / 2);
-            originalPos = position;
+            position = new Vector2(0+Rectangle.Width/2,0+Rectangle.Height/2);
+            originalPos = new Vector2(MainGame.Instance.ScreenWidth/2, MainGame.Instance.ScreenHeight / 2);
             shootingVelocity.Y = Math.Abs(shootingVelocity.Y); //So that bullets go down.
             timeToShoot = 1/shotsPerSec;
         }
@@ -185,8 +185,9 @@ namespace My_Smart_Spaceship
             catch (System.IO.FileNotFoundException){
                 return;
             }
-
-            string[] fullKnowledge = sr.ReadToEnd().Split(new char[]{'\n'});
+            string text = sr.ReadToEnd();
+            text.Replace("\r", "");
+            string[] fullKnowledge = text.Split(new char[]{'\n'});
 
             foreach(string fact in fullKnowledge) {
                 if (fact.Length == 0)   continue;
