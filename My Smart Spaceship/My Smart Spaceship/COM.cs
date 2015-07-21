@@ -276,9 +276,9 @@ namespace My_Smart_Spaceship
             if (moveTo.X >= screenWidth - Rectangle.Width)
                 moveTo.X = screenWidth - Rectangle.Width;
             if (moveTo.Y <= Rectangle.Height)
-                moveTo.Y = Rectangle.Height;
+                moveTo.Y = Rectangle.Height/2;
             if (moveTo.Y >= screenHeight - Rectangle.Height)
-                moveTo.Y = screenHeight - Rectangle.Height;
+                moveTo.Y = screenHeight - Rectangle.Height/2;
 
             targetPosition = moveTo;
             goingToPoint = true;

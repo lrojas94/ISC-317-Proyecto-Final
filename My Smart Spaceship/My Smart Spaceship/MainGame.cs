@@ -79,7 +79,7 @@ namespace My_Smart_Spaceship
             background = new Background(Content.Load<Texture2D>("purple.png"), new Vector2(100, 100), true);
             player = new Player(this.SpriteSheetHandler,@"Players/playerA_Blue", new Vector2(500,500));
             player.GenerateBullets(SpriteSheetHandler);
-            com = new COM(this.SpriteSheetHandler, @"Players/playerC_Mix", new Vector2(500, 500));
+            com = new COM(this.SpriteSheetHandler, @"Players/playerC_Mix", new Vector2(250, 250));
             com.GenerateBullets(SpriteSheetHandler);
             meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",60f,
                 new Vector2(300, 100),new Vector2(100,50), new Point(3, 9), new Point(13, 19));
