@@ -30,14 +30,15 @@ mover(Objeto, acercar):- acercar(Objeto), !.
 mover(_, quedarse_quieto):- !.
 
 % Objetos considerados como upgrades de artilleria.
-arma(Objeto, ia):- mejora(Objeto, armamento_ia), !.
 arma(Objeto, humano):- mejora(Objeto, armamento_humano), !.
+arma(Objeto, ia):- mejora(Objeto, armamento_ia), !.
+arma(Objeto, ia):- arma(Objeto, humano), !.
 
 % Todas las consideraciones de si algo es util para la IA.
 util(Objeto, ia):- vulnerable(Objeto, ia), !, fail.
-util(Objeto, ia):- arma(Objeto, humano), !, fail.
 util(Objeto, ia):- mejora(Objeto, ia), !.
 util(Objeto, ia):- arma(Objeto, ia), !.
+util(Objeto, ia):- mejora(Objeto, humano), !.
 util(_):- !.
 
 % uso general: aprendizaje( evento(causa, consecuencia) ).
