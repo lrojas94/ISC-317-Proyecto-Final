@@ -82,13 +82,13 @@ namespace My_Smart_Spaceship
             com = new COM(this.SpriteSheetHandler, @"Players/playerC_Mix", new Vector2(500, 500));
             com.GenerateBullets(SpriteSheetHandler);
             meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",60f,
-                new Vector2(300, 100),new Vector2(100,50), new Point(0, 9), new Point(10, 19));
+                new Vector2(300, 100),new Vector2(100,50), new Point(3, 9), new Point(13, 19));
 
             if (!PlEngine.IsInitialized)
             {
                 PlEngine.Initialize(new string[] { "-q", "AI.pl" });
             }
-            com.loadFromFile("conocimiento.txt");
+            com.LoadFromFile("Content/conocimiento.txt");
         }
 
         /// <summary>
@@ -115,9 +115,9 @@ namespace My_Smart_Spaceship
             List<Bullet> playerBullets = player.Bullets;
             List<Bullet> comBullets = com.Bullets;
             List<Meteors> meteors = meteorController.Meteors;
-            Rectangle comRange = com.actionRange();
+            Rectangle comRange = com.ActionRange();
             Vector2 direction = Vector2.Zero;
-            List<Tuple<Vector2, string>> actions = new List<Tuple<Vector2,string>>();
+            List<Tuple<Rectangle, string>> actions = new List<Tuple<Rectangle,string>>();
             PlQuery query;
 
             query = new PlQuery("mover(disparo(humano), Veredicto).");
@@ -127,8 +127,8 @@ namespace My_Smart_Spaceship
             foreach (Bullet b in playerBullets){
                 if (b.CanCollide){
 
-                    if(comRange.Contains(b.Rectangle))
-                        actions.Add(new Tuple<Vector2, string>(b.Position, objectVeredict));
+                    if(comRange.Intersects(b.Rectangle))
+                        actions.Add(new Tuple<Rectangle, string>(b.Rectangle, objectVeredict));
 
                     foreach (Meteors m in meteors){
                         if (m.CanCollide){
@@ -164,7 +164,7 @@ namespace My_Smart_Spaceship
                     {
                         if (hb.CanCollide)
                         {
-                            if (b.Rectangle.Contains(hb.Rectangle))
+                            if (b.Rectangle.Intersects(hb.Rectangle))
                             {
                                 hb.Explode();
                                 b.Explode();
@@ -221,6 +221,7 @@ namespace My_Smart_Spaceship
                                             TargetObject = "asteroide_gris"
                                         });
                             }
+
                 if (player.CanCollide && b.Rectangle.Intersects(player.Rectangle))
                 {
                     b.Explode();
@@ -245,16 +246,18 @@ namespace My_Smart_Spaceship
 
             foreach (Meteors m in meteors)
             {
-                if(comRange.Contains(m.Rectangle))
-                    actions.Add(new Tuple<Vector2,string>(m.Position, objectVeredict));
-
-
                 if (!m.CanCollide)
                     continue;
+
+                if (m.Rectangle.Intersects(comRange))
+                {
+                    actions.Add(new Tuple<Rectangle, string>(m.Rectangle, objectVeredict));
+                }
+
                 if (player.CanCollide && m.Rectangle.Intersects(player.Rectangle)) {
                     player.KillPlayer();
-
                 }
+
                 if (com.CanCollide && m.Rectangle.Intersects(com.Rectangle)) {
                     com.KillPlayer();
                     com.AddEvent(
@@ -281,12 +284,13 @@ namespace My_Smart_Spaceship
             #endregion
 
             // TODO: Add your update logic here
+
+            com.Update(gameTime, player.Position, actions);
             background.Update(gameTime);
             meteorController.Update(gameTime);
             player.Update(gameTime);
-            com.Update(gameTime, actions);
-
-            //For each meteor in meteorList
+            com.Update(gameTime, player.Position,actions);
+            
 
             base.Update(gameTime);
         }
@@ -310,6 +314,8 @@ namespace My_Smart_Spaceship
 
             spriteBatch.Begin();
             background.Draw(gameTime,spriteBatch);
+
+            //DrawColor(Color.Blue, com.ActionRange());
             meteorController.Draw(spriteBatch);
             player.Draw(spriteBatch);
             com.Draw(spriteBatch);
@@ -322,7 +328,7 @@ namespace My_Smart_Spaceship
 
         protected override void OnExiting(object sender, EventArgs args)
         {
-            com.dumpToFile("conocimiento.txt");
+            com.DumpToFile("Content/conocimiento.txt");
             base.OnExiting(sender, args);
         }
 

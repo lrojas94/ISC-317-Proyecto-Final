@@ -12,8 +12,7 @@ namespace My_Smart_Spaceship
 {
 	class COM : Player
 	{
-        private int counter = 0;
-
+        
         public enum PossibleCauses {
             Impacts
         }
@@ -33,12 +32,20 @@ namespace My_Smart_Spaceship
         }
 
         private List<string> eventsOnHold = new List<string>();
+        private int counter = 0;
+        private Vector2 targetPosition;
+        private bool goingToPoint = false;
+        private bool goingToStart = true;
+        private Vector2 originalPos;
+        Random random;
 
         public COM(SpriteSheetHandler handler, string spritePath, Vector2 playerSpeed) :
             base(handler,spritePath, playerSpeed) {
             Rectangle sprite = Rectangle;
+            random = new Random();
             //position = new Vector2(MainGame.Instance.ScreenWidth / 2,sprite.Height / 2); //Set COM at top.
             position = new Vector2(MainGame.Instance.ScreenWidth / 2,MainGame.Instance.ScreenHeight / 2);
+            originalPos = position;
             shootingVelocity.Y = Math.Abs(shootingVelocity.Y); //So that bullets go down.
         }
 
@@ -49,7 +56,7 @@ namespace My_Smart_Spaceship
                 b.ChangeAnimations(handler, "Bullet_Red_Move", "Bullet_Red_Explode");
         }
 
-        public void Update(GameTime gameTime, List<Tuple<Vector2, string>> actions = null)
+        public void Update(GameTime gameTime, Vector2 playerPos, List<Tuple<Rectangle, string>> actions = null)
         {
             if(counter > 30){
                 addEvents();
@@ -57,14 +64,22 @@ namespace My_Smart_Spaceship
             }
             else
                 counter++;
-
             //Update Code ^^
+            float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
             switch (state) {
                 case PlayerStates.Alive:
-                    if(counter > 29)
-                        shoot();
-                    mover(gameTime, actions);
+
+                    move(gameTime, actions);
+                    if (goingToPoint)
+                        goTo(targetPosition, delta);
+                       
+                    else
+                    {
+                        goTo(originalPos, delta);
+                    }
+                    
                     position = position.KeepInGameFrame(Rectangle);
+
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);
@@ -120,22 +135,18 @@ namespace My_Smart_Spaceship
                     break;
 
             }
-
             string newEvent = String.Format("evento({0},{1})", newCause, newConsecuence);
             eventsOnHold.Add(newEvent);
         }
 
         private void addEvents() {
             string finalQuery = String.Format("percepcion([{0}]).", string.Join(",", eventsOnHold));
-
-            Console.Out.WriteLine(finalQuery);
-
             PlQuery.PlCall(finalQuery);
             eventsOnHold.Clear();
         }
 
         
-        public void loadFromFile(string filePath){
+        public void LoadFromFile(string filePath){
 
             System.IO.StreamReader sr;
 
@@ -158,7 +169,7 @@ namespace My_Smart_Spaceship
             sr.Dispose();
         }
 
-        public void dumpToFile(string filePath)
+        public void DumpToFile(string filePath)
         {
             
             // Todas las reglas dinamicamente asertadas seran escritas en un archivo
@@ -180,53 +191,98 @@ namespace My_Smart_Spaceship
         }
 
 
-        public Rectangle actionRange(){
+        public Rectangle ActionRange(){
             Vector2 finalDirection = Vector2.Zero;
-
-            Point fieldSize = new Point(this.Rectangle.Size.X*8, this.Rectangle.Size.Y*8);
-            Point fieldOrigin = new Point(this.Rectangle.Center.X - fieldSize.X/2, this.Rectangle.Center.Y - fieldSize.Y/2);
-            
+            int maxSize = Math.Max(Rectangle.Width, Rectangle.Height);
+            Point fieldSize = new Point(maxSize*4, maxSize*4);
+            Point fieldOrigin = new Point((int)position.X - fieldSize.X/2, (int)position.Y - fieldSize.Y/2);
             return new Rectangle(fieldOrigin, fieldSize);
         }
 
-        private void mover(GameTime gameTime, List<Tuple<Vector2,string>> actions){
+        private void move(GameTime gameTime, List<Tuple<Rectangle, string>> actions) {
             if (actions == null) return;
 
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Vector2 newDirection = Vector2.Zero;
-            Vector2 tmp = Vector2.Zero;
-
-            foreach(Tuple<Vector2,string> o in actions){
-                if (o.Item2 == "quedarse_quieto")
+            Vector2 moveTo = position;
+            Vector2 difference = Vector2.Zero;
+            Random random = new Random();
+            int screenHeight = MainGame.Instance.ScreenHeight;
+            int screenWidth = MainGame.Instance.ScreenWidth;
+            
+            foreach (Tuple<Rectangle, string> action in actions) {
+                if (action.Item2 == "quedarse_quieto")
                     continue;
 
-                Console.Out.WriteLine(o.Item2);
-                tmp = (position - o.Item1);
-                tmp.Normalize();
-
-                if(o.Item2 == "alejar"){
-                    newDirection += tmp;
-                }
-                else if(o.Item2 == "acercar"){
-                    newDirection -= tmp;
-                }
+                // Console.Out.WriteLine(action.Item2);
+                float distance = Vector2.DistanceSquared(moveTo, action.Item1.Center.ToVector2());
+                difference = (moveTo - action.Item1.Center.ToVector2()) * 2*screenWidth/distance; //Dividing by distance will farther from the closest one.
+                
+                //Console.WriteLine("Actual -> " + moveTo + " Item -> " + action.Item1.Center.ToVector2());
+                if (difference.Y == 0)
+                    difference.Y += (random.Next(0, 1) * 2 - 1) * Rectangle.Height;
+                if (difference.X == 0)
+                    difference.X += (random.Next(0, 1)* 2 - 1) * Rectangle.Width;
+              //  Console.WriteLine("Diferencia -> " + difference);
+              //  Console.WriteLine("Actual a -> " + moveTo);
+                if (action.Item2 == "alejar")
+                    moveTo += difference;
+                
+                else if(action.Item2 == "acercar")
+                    moveTo -= difference;
             }
 
-            if (newDirection == Vector2.Zero)
-                return;
+            //moveTo.Normalize();
 
-            newDirection.Normalize();
-            newDirection *= playerSpeed.Length() * delta;
-            position += newDirection;
+            
+            if (moveTo == position)
+                return;
+            //moveTo *= playerSpeed * delta;
+            //position += moveTo;
+
+            //Alejar al jugador de las esquinas:
+            if (moveTo.X <= Rectangle.Width)
+                moveTo.X = Rectangle.Width;
+            if (moveTo.X >= screenWidth - Rectangle.Width)
+                moveTo.X = screenWidth - Rectangle.Width;
+            if (moveTo.Y <= Rectangle.Height)
+                moveTo.Y = Rectangle.Height;
+            if (moveTo.Y >= screenHeight - Rectangle.Height)
+                moveTo.Y = screenHeight - Rectangle.Height;
+
+            targetPosition = moveTo;
+            goingToPoint = true;
+            goingToStart = false;
+            
         }
 
-        public Rectangle fireRange(){
+        public Rectangle FireRange(){
             Point end = new Point(Rectangle.Width, MainGame.Instance.ScreenHeight);
             Point origin = position.ToPoint();
             origin.X -= Rectangle.Width / 2;
             origin.Y -= Rectangle.Height / 2;
-
             return new Rectangle(origin, end);
         }
+
+        private bool canGoTo(Vector2 target) {
+            if (Math.Abs(Vector2.Distance(position, target)) > 10)
+                return true;
+            return false;
+        }
+
+        private void goTo(Vector2 target,float delta) {
+            float distance = Math.Abs(Vector2.Distance(position, target));
+            if (distance < 20f && goingToPoint)
+            {
+                goingToPoint = false;
+                goingToStart = true;
+            }
+            else if (distance > 20f)
+            {
+                Vector2 direction = target - position;
+                direction.Normalize();
+                position += this.playerSpeed * direction * delta ; 
+            }
+        }
+       
 	}
 }

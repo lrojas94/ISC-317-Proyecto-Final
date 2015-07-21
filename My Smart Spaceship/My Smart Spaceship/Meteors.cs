@@ -36,6 +36,12 @@ namespace My_Smart_Spaceship
                 return state == MeteorStates.Moving;
             }
         }
+        
+        public Vector2 Velocity {
+            get {
+                return velocity;
+            }
+        }
 
         public bool IsUndestructible {
             get {
