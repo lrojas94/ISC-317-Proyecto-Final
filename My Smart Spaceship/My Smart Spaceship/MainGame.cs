@@ -116,18 +116,24 @@ namespace My_Smart_Spaceship
             List<Bullet> comBullets = com.Bullets;
             List<Meteors> meteors = meteorController.Meteors;
             Rectangle comRange = com.ActionRange();
+            Rectangle comFireRange = com.FireRange();
             Vector2 direction = Vector2.Zero;
             List<Tuple<Rectangle, string>> actions = new List<Tuple<Rectangle,string>>();
             PlQuery query;
-
+            bool comShouldShoot = false;
             query = new PlQuery("mover(disparo(humano), Veredicto).");
             string objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
             query.Dispose();
 
+            
+
             foreach (Bullet b in playerBullets){
                 if (b.CanCollide){
 
-                    if(comRange.Intersects(b.Rectangle))
+                    if(b.Rectangle.Intersects(comFireRange))
+                        comShouldShoot = PlQuery.PlCall("disparar(disparo(humano)).") | comShouldShoot;
+
+                    if (comRange.Intersects(b.Rectangle))
                         actions.Add(new Tuple<Rectangle, string>(b.Rectangle, objectVeredict));
 
                     foreach (Meteors m in meteors){
@@ -247,6 +253,9 @@ namespace My_Smart_Spaceship
                 if (!m.CanCollide)
                     continue;
 
+                if(m.Rectangle.Intersects(comFireRange))
+                    comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).", m.IsUndestructible ? "asteroide_gris" : "asteroide"))
+                                    | comShouldShoot;
                 query = new PlQuery(String.Format("mover({0}, Veredicto).",m.IsUndestructible ? "asteroide_gris" : "asteroide"));
                 objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
                 query.Dispose();
@@ -277,11 +286,12 @@ namespace My_Smart_Spaceship
                         }
                         );
                 }
-
-
-
-
+                
             }
+
+            if(player.CanCollide && player.Rectangle.Intersects(comFireRange))
+                comShouldShoot = PlQuery.PlCall("disparar(humano).") | comShouldShoot;
+
 
             #endregion
 
@@ -292,7 +302,8 @@ namespace My_Smart_Spaceship
             meteorController.Update(gameTime);
             player.Update(gameTime);
             com.Update(gameTime, player.Position,actions);
-            
+            if (comShouldShoot)
+                com.Shoot();
 
             base.Update(gameTime);
         }
@@ -317,7 +328,7 @@ namespace My_Smart_Spaceship
             spriteBatch.Begin();
             background.Draw(gameTime,spriteBatch);
 
-            //DrawColor(Color.Blue, com.ActionRange());
+            //DrawColor(Color.Blue, com.FireRange());
             meteorController.Draw(spriteBatch);
             player.Draw(spriteBatch);
             com.Draw(spriteBatch);

@@ -40,6 +40,11 @@ namespace My_Smart_Spaceship
         private float shotsPerSec = 2;
         private float elapsedSinceShot = 0;
         private float timeToShoot;
+        private float timeSinceLastShot = 0;
+        //NOTE: Difference betwee timeSinceLastShot and elapsedSinceShot is that
+        //time is supposed to shot EVEN if it cannot shot. The reason why is so that the AI can hit something and learn.
+
+        private bool canShoot = false;
         Random random;
 
         public COM(SpriteSheetHandler handler, string spritePath, Vector2 playerSpeed) :
@@ -71,7 +76,7 @@ namespace My_Smart_Spaceship
             //Update Code ^^
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
             elapsedSinceShot += delta;
-
+            timeSinceLastShot += delta;
             switch (state) {
                 case PlayerStates.Alive:
                     move(gameTime, actions);
@@ -80,13 +85,18 @@ namespace My_Smart_Spaceship
                        
                     else
                         goTo(originalPos, delta);
-                    
+                    if (timeSinceLastShot >= random.Next(3,7))
+                    {
+                        shoot();
+                        canShoot = false;
+                        timeSinceLastShot = 0;
+                        elapsedSinceShot = 0;
+                    }
                     position = position.KeepInGameFrame(Rectangle);
                     if(elapsedSinceShot > timeToShoot)
                     {
                         elapsedSinceShot = 0;
-                        //SHOOT! -> Check if AI SHOULD really shoot.
-                        //shoot();
+                        canShoot = true;
                     }
                     break;
                 case PlayerStates.Dead:
@@ -105,6 +115,17 @@ namespace My_Smart_Spaceship
                     i--;
                 }
             }
+        }
+
+        public void Shoot() {
+            if (canShoot)
+            {
+                canShoot = false;
+                elapsedSinceShot = 0;
+                timeSinceLastShot = 0;
+                shoot();
+            }
+
         }
 
         public new void Draw(SpriteBatch spriteBatch) {
@@ -207,6 +228,7 @@ namespace My_Smart_Spaceship
             return new Rectangle(fieldOrigin, fieldSize);
         }
 
+
         private void move(GameTime gameTime, List<Tuple<Rectangle, string>> actions) {
             if (actions == null) return;
 
@@ -235,7 +257,6 @@ namespace My_Smart_Spaceship
               //  Console.WriteLine("Actual a -> " + moveTo);
                 if (action.Item2 == "alejar")
                     moveTo += difference;
-                
                 else if(action.Item2 == "acercar")
                     moveTo -= difference;
             }
