@@ -37,6 +37,9 @@ namespace My_Smart_Spaceship
         private bool goingToPoint = false;
         private bool goingToStart = true;
         private Vector2 originalPos;
+        private float shotsPerSec = 2;
+        private float elapsedSinceShot = 0;
+        private float timeToShoot;
         Random random;
 
         public COM(SpriteSheetHandler handler, string spritePath, Vector2 playerSpeed) :
@@ -47,6 +50,7 @@ namespace My_Smart_Spaceship
             position = new Vector2(MainGame.Instance.ScreenWidth / 2,MainGame.Instance.ScreenHeight / 2);
             originalPos = position;
             shootingVelocity.Y = Math.Abs(shootingVelocity.Y); //So that bullets go down.
+            timeToShoot = 1/shotsPerSec;
         }
 
         public new void GenerateBullets(SpriteSheetHandler handler, int count = 100)
@@ -66,20 +70,24 @@ namespace My_Smart_Spaceship
                 counter++;
             //Update Code ^^
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            elapsedSinceShot += delta;
+
             switch (state) {
                 case PlayerStates.Alive:
-
                     move(gameTime, actions);
                     if (goingToPoint)
                         goTo(targetPosition, delta);
                        
                     else
-                    {
                         goTo(originalPos, delta);
-                    }
                     
                     position = position.KeepInGameFrame(Rectangle);
-
+                    if(elapsedSinceShot > timeToShoot)
+                    {
+                        elapsedSinceShot = 0;
+                        //SHOOT! -> Check if AI SHOULD really shoot.
+                        //shoot();
+                    }
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);

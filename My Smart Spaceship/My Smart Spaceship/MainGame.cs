@@ -240,14 +240,16 @@ namespace My_Smart_Spaceship
                 }
             }
 
-            query = new PlQuery("mover(asteroide, Veredicto).");
-            objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
-            query.Dispose();
+            
 
             foreach (Meteors m in meteors)
             {
                 if (!m.CanCollide)
                     continue;
+
+                query = new PlQuery(String.Format("mover({0}, Veredicto).",m.IsUndestructible ? "asteroide_gris" : "asteroide"));
+                objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
+                query.Dispose();
 
                 if (m.Rectangle.Intersects(comRange))
                 {
@@ -264,13 +266,13 @@ namespace My_Smart_Spaceship
                         new COM.Cause
                         {
                             PossibleCause = COM.PossibleCauses.Impacts,
-                            Stimulus = "asteroide",
+                            Stimulus = m.IsUndestructible ? "asteroide_gris" : "asteroide",
                             TargetObject = "ia"
                         },
                         new COM.Consecuence
                         {
                             PossibleConsecuence = COM.PossibleConsecuences.Damages,
-                            Stimulus = "asteroide",
+                            Stimulus = m.IsUndestructible ? "asteroide_gris" : "asteroide",
                             TargetObject = "ia"
                         }
                         );
