@@ -25,6 +25,21 @@ namespace My_Smart_Spaceship
         private bool isActive;
         private bool isUndestructible;
         private float explosionScale = 1.0f;
+        protected string name = "asteroide";
+
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+            set
+            {
+                name = value;
+            }
+        }
+
+
         public bool IsVisible {
             get {
                 return isActive;

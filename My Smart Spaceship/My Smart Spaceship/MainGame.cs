@@ -42,7 +42,7 @@ namespace My_Smart_Spaceship
         COM com;
         //Meteors List
         MeteorController meteorController;
-
+        PowerUpGenerator powerUpGenerator;
         Random random = new Random();
         public MainGame()
         {
@@ -81,8 +81,9 @@ namespace My_Smart_Spaceship
             player.GenerateBullets(SpriteSheetHandler);
             com = new COM(this.SpriteSheetHandler, @"Players/playerC_Mix", new Vector2(250, 250));
             com.GenerateBullets(SpriteSheetHandler);
-            meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",60f,
-                new Vector2(300, 100),new Vector2(100,50), new Point(3, 9), new Point(13, 19));
+            meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",120f,
+                new Vector2(300, 100),new Vector2(100,50), new Point(0, 9), new Point(10, 19));
+            powerUpGenerator = new PowerUpGenerator(SpriteSheetHandler, @"PowerUps/", new Point(0, 3));
 
             if (!PlEngine.IsInitialized)
             {
@@ -121,20 +122,23 @@ namespace My_Smart_Spaceship
             List<Tuple<Rectangle, string>> actions = new List<Tuple<Rectangle,string>>();
             PlQuery query;
             bool comShouldShoot = false;
-            query = new PlQuery("mover(disparo(humano), Veredicto).");
-            string objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
-            query.Dispose();
+            string objectVeredict;
 
-            
+
 
             foreach (Bullet b in playerBullets){
                 if (b.CanCollide){
 
                     if(b.Rectangle.Intersects(comFireRange))
-                        comShouldShoot = PlQuery.PlCall("disparar(disparo(humano)).") | comShouldShoot;
+                        comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).",b.Name)) | comShouldShoot;
 
                     if (comRange.Intersects(b.Rectangle))
+                    {
+                        query = new PlQuery(String.Format("mover({0}, Veredicto).",b.Name));
+                        objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
+                        query.Dispose();
                         actions.Add(new Tuple<Rectangle, string>(b.Rectangle, objectVeredict));
+                    }
 
                     foreach (Meteors m in meteors){
                         if (m.CanCollide){
@@ -150,12 +154,12 @@ namespace My_Smart_Spaceship
                 {
                     com.AddEvent(new COM.Cause {
                         PossibleCause = COM.PossibleCauses.Impacts,
-                        Stimulus = "disparo(humano)",
-                        TargetObject = "ia"
+                        Stimulus = b.Name,
+                        TargetObject = com.Name
                     }, new COM.Consecuence {
                         PossibleConsecuence = COM.PossibleConsecuences.Damages,
-                        Stimulus = "disparo(humano)",
-                        TargetObject = "ia"
+                        Stimulus = b.Name,
+                        TargetObject = com.Name
                     });
                     com.KillPlayer();
                 }
@@ -177,13 +181,13 @@ namespace My_Smart_Spaceship
                                 com.AddEvent(new COM.Cause
                                 {
                                     PossibleCause = COM.PossibleCauses.Impacts,
-                                    Stimulus = "disparo(ia)",
-                                    TargetObject = "disparo(humano)"
+                                    Stimulus = b.Name,
+                                    TargetObject = hb.Name
                                 }, new COM.Consecuence
                                 {
                                     PossibleConsecuence = COM.PossibleConsecuences.Damages,
-                                    Stimulus = "disparo(ia)",
-                                    TargetObject = "disparo(humano)"
+                                    Stimulus = b.Name,
+                                    TargetObject = hb.Name
                                 });
                                 break;
                             }
@@ -202,14 +206,14 @@ namespace My_Smart_Spaceship
                                         new COM.Cause
                                         {
                                             PossibleCause = COM.PossibleCauses.Impacts,
-                                            Stimulus = "disparo(ia)",
-                                            TargetObject = "asteroide"
+                                            Stimulus = b.Name,
+                                            TargetObject = m.Name
                                         },
                                         new COM.Consecuence
                                         {
                                             PossibleConsecuence = COM.PossibleConsecuences.Damages,
-                                            Stimulus = "disparo(ia)",
-                                            TargetObject = "asteroide"
+                                            Stimulus = b.Name,
+                                            TargetObject = m.Name
                                         });
                                 }
                                 else
@@ -217,14 +221,14 @@ namespace My_Smart_Spaceship
                                         new COM.Cause
                                         {
                                             PossibleCause = COM.PossibleCauses.Impacts,
-                                            Stimulus = "disparo(ia)",
-                                            TargetObject = "asteroide_gris"
+                                            Stimulus = b.Name,
+                                            TargetObject = m.Name
                                         },
                                         new COM.Consecuence
                                         {
                                             PossibleConsecuence = COM.PossibleConsecuences.Ignores,
-                                            Stimulus = "disparo(ia)",
-                                            TargetObject = "asteroide_gris"
+                                            Stimulus = b.Name,
+                                            TargetObject = m.Name
                                         });
                             }
 
@@ -235,28 +239,27 @@ namespace My_Smart_Spaceship
                     com.AddEvent(new COM.Cause
                     {
                         PossibleCause = COM.PossibleCauses.Impacts,
-                        Stimulus = "disparo(ia)",
-                        TargetObject = "humano"
+                        Stimulus = b.Name,
+                        TargetObject = player.Name
                     }, new COM.Consecuence
                     {
                         PossibleConsecuence = COM.PossibleConsecuences.Damages,
-                        Stimulus = "disparo(ia)",
-                        TargetObject = "humano"
+                        Stimulus = b.Name,
+                        TargetObject = player.Name
                     });
                 }
             }
 
             
-
             foreach (Meteors m in meteors)
             {
                 if (!m.CanCollide)
                     continue;
 
                 if(m.Rectangle.Intersects(comFireRange))
-                    comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).", m.IsUndestructible ? "asteroide_gris" : "asteroide"))
+                    comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).", m.Name))
                                     | comShouldShoot;
-                query = new PlQuery(String.Format("mover({0}, Veredicto).",m.IsUndestructible ? "asteroide_gris" : "asteroide"));
+                query = new PlQuery(String.Format("mover({0}, Veredicto).",m.Name));
                 objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
                 query.Dispose();
 
@@ -275,14 +278,14 @@ namespace My_Smart_Spaceship
                         new COM.Cause
                         {
                             PossibleCause = COM.PossibleCauses.Impacts,
-                            Stimulus = m.IsUndestructible ? "asteroide_gris" : "asteroide",
-                            TargetObject = "ia"
+                            Stimulus = m.Name,
+                            TargetObject = com.Name
                         },
                         new COM.Consecuence
                         {
                             PossibleConsecuence = COM.PossibleConsecuences.Damages,
-                            Stimulus = m.IsUndestructible ? "asteroide_gris" : "asteroide",
-                            TargetObject = "ia"
+                            Stimulus = m.Name,
+                            TargetObject = com.Name
                         }
                         );
                 }
@@ -290,9 +293,53 @@ namespace My_Smart_Spaceship
             }
 
             if(player.CanCollide && player.Rectangle.Intersects(comFireRange))
-                comShouldShoot = PlQuery.PlCall("disparar(humano).") | comShouldShoot;
+                comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).",player.Name)) | comShouldShoot;
 
+            if (player.CanCollide && powerUpGenerator.PowerUp.IsActive && player.Rectangle.Intersects(powerUpGenerator.PowerUp.Rectangle))
+            {
+                player.PowerUp = powerUpGenerator.PowerUp.Power;
+                com.AddEvent(new COM.Cause
+                {
+                    PossibleCause = COM.PossibleCauses.Impacts,
+                    Stimulus = powerUpGenerator.PowerUp.Name,
+                    TargetObject = player.Name
+                },
+                new COM.Consecuence
+                {
+                    PossibleConsecuence = COM.PossibleConsecuences.Benefits,
+                    Stimulus = powerUpGenerator.PowerUp.Name,
+                    TargetObject = player.Name
+                });
+                powerUpGenerator.Take();
+                
+            }
 
+            if (com.CanCollide && powerUpGenerator.PowerUp.IsActive && com.Rectangle.Intersects(powerUpGenerator.PowerUp.Rectangle))
+            {
+                com.PowerUp = powerUpGenerator.PowerUp.Power;
+                com.AddEvent(new COM.Cause
+                {
+                    PossibleCause = COM.PossibleCauses.Impacts,
+                    Stimulus = powerUpGenerator.PowerUp.Name,
+                    TargetObject = com.Name
+                },
+                new COM.Consecuence
+                {
+                    PossibleConsecuence = COM.PossibleConsecuences.Benefits,
+                    Stimulus = powerUpGenerator.PowerUp.Name,
+                    TargetObject = com.Name
+                });
+                powerUpGenerator.Take();
+
+            }
+
+            if (powerUpGenerator.PowerUp.IsActive )
+            { //&& powerUpGenerator.PowerUp.Rectangle.Intersects(com.ActionRange(2))
+                query = new PlQuery(String.Format("mover({0}, Veredicto).", powerUpGenerator.PowerUp.Name));
+                objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
+                query.Dispose();
+                actions.Add(new Tuple<Rectangle, string>(powerUpGenerator.PowerUp.Rectangle, objectVeredict));
+            }
             #endregion
 
             // TODO: Add your update logic here
@@ -302,6 +349,7 @@ namespace My_Smart_Spaceship
             meteorController.Update(gameTime);
             player.Update(gameTime);
             com.Update(gameTime, player.Position,actions);
+            powerUpGenerator.Update(gameTime);
             if (comShouldShoot)
                 com.Shoot();
 
@@ -330,9 +378,10 @@ namespace My_Smart_Spaceship
 
             //DrawColor(Color.Blue, com.FireRange());
             meteorController.Draw(spriteBatch);
+            powerUpGenerator.Draw(spriteBatch);
             player.Draw(spriteBatch);
             com.Draw(spriteBatch);
-          
+            
             spriteBatch.End();
             // TODO: Add your drawing code here
 

@@ -45,10 +45,12 @@
     <Compile Include="COM.cs" />
     <Compile Include="Bullet.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="PowerUpGenerator.cs" />
     <Compile Include="MainGame.cs" />
     <Compile Include="MeteorController.cs" />
     <Compile Include="Meteors.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="PowerUp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpriteData.cs" />
