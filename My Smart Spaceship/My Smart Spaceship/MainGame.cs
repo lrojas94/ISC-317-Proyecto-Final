@@ -351,7 +351,6 @@ namespace My_Smart_Spaceship
 
             if (player.CanCollide && powerUpGenerator.PowerUp.IsActive && player.Rectangle.Intersects(powerUpGenerator.PowerUp.Rectangle))
             {
-                player.PowerUp = powerUpGenerator.PowerUp.Power;
                 com.AddEvent(new COM.Cause
                 {
                     PossibleCause = COM.PossibleCauses.Impacts,
@@ -364,13 +363,13 @@ namespace My_Smart_Spaceship
                     Stimulus = powerUpGenerator.PowerUp.Name,
                     TargetObject = player.Name
                 });
+                player.PowerUp = powerUpGenerator.PowerUp.Power;
                 powerUpGenerator.Take();
                 
             }
 
             if (com.CanCollide && powerUpGenerator.PowerUp.IsActive && com.Rectangle.Intersects(powerUpGenerator.PowerUp.Rectangle))
             {
-                com.PowerUp = powerUpGenerator.PowerUp.Power;
                 com.AddEvent(new COM.Cause
                 {
                     PossibleCause = COM.PossibleCauses.Impacts,
@@ -383,6 +382,7 @@ namespace My_Smart_Spaceship
                     Stimulus = powerUpGenerator.PowerUp.Name,
                     TargetObject = com.Name
                 });
+                com.PowerUp = powerUpGenerator.PowerUp.Power;
                 powerUpGenerator.Take();
 
             }
