@@ -117,6 +117,8 @@ namespace My_Smart_Spaceship
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);
+                    if (explosionAnimation.IsDone)
+                        state = PlayerStates.ReallyDead;
                     break;
             }
 

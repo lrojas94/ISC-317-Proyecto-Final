@@ -43,3 +43,9 @@
 /processorParam:Quality=Best
 /build:SoundFX/Background_Music.mp3
 
+#begin PTSans.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:PTSans.spritefont
+

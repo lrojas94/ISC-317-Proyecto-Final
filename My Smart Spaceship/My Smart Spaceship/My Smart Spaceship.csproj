@@ -105,6 +105,7 @@
     <None Include="AI.pl">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Content\PTSans.spritefont" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

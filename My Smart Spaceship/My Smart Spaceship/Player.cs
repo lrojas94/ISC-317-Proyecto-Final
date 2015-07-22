@@ -12,7 +12,7 @@ namespace My_Smart_Spaceship
     class Player
     {
         protected enum PlayerStates {
-            Alive,Dead
+            Alive,Dead,ReallyDead
         }
 
         public enum PowerUps {
@@ -36,7 +36,7 @@ namespace My_Smart_Spaceship
         protected Random random = new Random();
         protected Animator shieldAnimation;
         protected string name = "humano";
-
+        
         public string Name {
             get {
                 return name + (powerUp != PowerUps.None ? String.Format("({0})", powerUp.ToString().ToLower()) : "") ;
@@ -46,6 +46,12 @@ namespace My_Smart_Spaceship
             }
         }
 
+        public bool GameOver
+        {
+            get {
+                return state == PlayerStates.ReallyDead;
+            }
+        }
         public Player.PowerUps PowerUp {
             set {
                 powerUp = value;
@@ -184,6 +190,8 @@ namespace My_Smart_Spaceship
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);
+                    if (explosionAnimation.IsDone)
+                        state = PlayerStates.ReallyDead;
                     break;
             }
 

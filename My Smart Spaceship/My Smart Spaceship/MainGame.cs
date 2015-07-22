@@ -18,12 +18,15 @@ namespace My_Smart_Spaceship
     /// 
     public class MainGame : Game
     {
-        
-
         public int ScreenHeight = 600;
         public int ScreenWidth = 800;
         public SpriteSheetHandler SpriteSheetHandler;
-        
+
+        private enum GameStates
+        {
+            Running, Over
+        }
+
 
         private static MainGame instance;
         public static MainGame Instance
@@ -48,7 +51,9 @@ namespace My_Smart_Spaceship
         MeteorController meteorController;
         PowerUpGenerator powerUpGenerator;
         Random random = new Random();
-
+        GameStates state;
+        string winner;
+        SpriteFont font;
         public MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -93,12 +98,14 @@ namespace My_Smart_Spaceship
             soundfx = new Dictionary<string, SoundEffect>();
             // SOUND FX !!!
             bgm = Content.Load<Song>("SoundFX/Background_Music");
+            font = Content.Load<SpriteFont>("PTSans");
             MediaPlayer.Play(bgm);
             soundfx.Add("Bullet", Content.Load<SoundEffect>("SoundFX/Bullet"));
             soundfx.Add("SuperBullet", Content.Load<SoundEffect>("SoundFX/SuperBullet"));
             soundfx.Add("Shield", Content.Load<SoundEffect>("SoundFX/Shield"));
             soundfx.Add("Explosion", Content.Load<SoundEffect>("SoundFX/Explosion"));
-            
+
+            state = GameStates.Running;
 
             if (!PlEngine.IsInitialized) {
                 PlEngine.Initialize(new string[] { "-q", "AI.pl" });
@@ -121,284 +128,319 @@ namespace My_Smart_Spaceship
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+            switch (state) {
+                case GameStates.Running:
+                    #region Collisions
+                    //PlayerBullets and Asteroids:
+                    List<Bullet> playerBullets = player.Bullets;
+                    List<Bullet> comBullets = com.Bullets;
+                    List<Meteors> meteors = meteorController.Meteors;
+                    Rectangle comRange = com.ActionRange();
+                    Rectangle comFireRange = com.FireRange();
+                    Vector2 direction = Vector2.Zero;
+                    List<Tuple<Rectangle, string>> actions = new List<Tuple<Rectangle, string>>();
+                    PlQuery query;
+                    bool comShouldShoot = false;
+                    string objectVeredict;
 
-            #region Collisions
-            //PlayerBullets and Asteroids:
-            List<Bullet> playerBullets = player.Bullets;
-            List<Bullet> comBullets = com.Bullets;
-            List<Meteors> meteors = meteorController.Meteors;
-            Rectangle comRange = com.ActionRange();
-            Rectangle comFireRange = com.FireRange();
-            Vector2 direction = Vector2.Zero;
-            List<Tuple<Rectangle, string>> actions = new List<Tuple<Rectangle,string>>();
-            PlQuery query;
-            bool comShouldShoot = false;
-            string objectVeredict;
-
-            // Dispose all of the inactive audio instances
-            for (int i = 0; i < activeSounds.Count; i++){
-                if (activeSounds[i].State == SoundState.Stopped){
-                    activeSounds.RemoveAt(i);
-                }
-            }
-
-            foreach (Bullet b in playerBullets){
-                if (b.CanCollide){
-
-                    if(b.Rectangle.Intersects(comFireRange))
-                        comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).",b.Name)) | comShouldShoot;
-
-                    if (comRange.Intersects(b.Rectangle))
+                    // Dispose all of the inactive audio instances
+                    for (int i = 0; i < activeSounds.Count; i++)
                     {
-                        query = new PlQuery(String.Format("mover({0}, Veredicto).",b.Name));
-                        objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
-                        query.Dispose();
-                        actions.Add(new Tuple<Rectangle, string>(b.Rectangle, objectVeredict));
-                    }
-
-                    foreach (Meteors m in meteors){
-                        if (m.CanCollide){
-                            if (b.Rectangle.Intersects(m.Rectangle)){
-                                b.Explode();
-                                SoundEffectInstance soundInstance = soundfx["Explosion"].CreateInstance();
-
-                                if (!m.IsUndestructible)
-                                {
-                                    m.Explode();
-                                    soundToPlay("Explosion");
-                                }
-                                else
-                                    soundToPlay("Explosion", 0.7f);
-                            }
-                        }
-                    }
-                }
-                if (com.CanCollide && b.Rectangle.Intersects(com.Rectangle))
-                {
-                    bool kill_able = com.KillPlayer();
-                    soundToPlay("Explosion", kill_able ? 1.0f : 0.4f);
-                    com.AddEvent(new COM.Cause {
-                        PossibleCause = COM.PossibleCauses.Impacts,
-                        Stimulus = b.Name,
-                        TargetObject = com.Name
-                    }, new COM.Consecuence {
-                        PossibleConsecuence = kill_able ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
-                        Stimulus = b.Name,
-                        TargetObject = com.Name
-                    });
-                }
-                
-            }
-
-            foreach (Bullet b in comBullets)
-            {
-                if (b.CanCollide)
-                    foreach (Bullet hb in playerBullets)
-                    {
-                        if (hb.CanCollide)
+                        if (activeSounds[i].State == SoundState.Stopped)
                         {
-                            if (b.Rectangle.Intersects(hb.Rectangle))
-                            {
-                                hb.Explode();
-                                b.Explode();
-                                soundToPlay("Explosion", 0.5f, 1.0f);
-                                com.AddEvent(new COM.Cause
-                                {
-                                    PossibleCause = COM.PossibleCauses.Impacts,
-                                    Stimulus = b.Name,
-                                    TargetObject = hb.Name
-                                }, new COM.Consecuence
-                                {
-                                    PossibleConsecuence = COM.PossibleConsecuences.Damages,
-                                    Stimulus = b.Name,
-                                    TargetObject = hb.Name
-                                });
-                                break;
-                            }
+                            activeSounds.RemoveAt(i);
                         }
                     }
 
-                    foreach (Meteors m in meteors)
-                        if (m.CanCollide)
-                            if (b.Rectangle.Intersects(m.Rectangle))
+                    foreach (Bullet b in playerBullets)
+                    {
+                        if (b.CanCollide)
+                        {
+
+                            if (b.Rectangle.Intersects(comFireRange))
+                                comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).", b.Name)) | comShouldShoot;
+
+                            if (comRange.Intersects(b.Rectangle))
                             {
-                                b.Explode();
-                                if (!m.IsUndestructible)
+                                query = new PlQuery(String.Format("mover({0}, Veredicto).", b.Name));
+                                objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
+                                query.Dispose();
+                                actions.Add(new Tuple<Rectangle, string>(b.Rectangle, objectVeredict));
+                            }
+
+                            foreach (Meteors m in meteors)
+                            {
+                                if (m.CanCollide)
                                 {
-                                    m.Explode();
-                                    soundToPlay("Explosion");
-                                    com.AddEvent(
-                                        new COM.Cause
+                                    if (b.Rectangle.Intersects(m.Rectangle))
+                                    {
+                                        b.Explode();
+                                        SoundEffectInstance soundInstance = soundfx["Explosion"].CreateInstance();
+
+                                        if (!m.IsUndestructible)
+                                        {
+                                            m.Explode();
+                                            soundToPlay("Explosion");
+                                        }
+                                        else
+                                            soundToPlay("Explosion", 0.7f);
+                                    }
+                                }
+                            }
+                        }
+                        if (com.CanCollide && b.Rectangle.Intersects(com.Rectangle))
+                        {
+                            bool kill_able = com.KillPlayer();
+                            soundToPlay("Explosion", kill_able ? 1.0f : 0.4f);
+                            com.AddEvent(new COM.Cause
+                            {
+                                PossibleCause = COM.PossibleCauses.Impacts,
+                                Stimulus = b.Name,
+                                TargetObject = com.Name
+                            }, new COM.Consecuence
+                            {
+                                PossibleConsecuence = kill_able ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
+                                Stimulus = b.Name,
+                                TargetObject = com.Name
+                            });
+                        }
+
+                    }
+
+                    foreach (Bullet b in comBullets)
+                    {
+                        if (b.CanCollide)
+                            foreach (Bullet hb in playerBullets)
+                            {
+                                if (hb.CanCollide)
+                                {
+                                    if (b.Rectangle.Intersects(hb.Rectangle))
+                                    {
+                                        hb.Explode();
+                                        b.Explode();
+                                        soundToPlay("Explosion", 0.5f, 1.0f);
+                                        com.AddEvent(new COM.Cause
                                         {
                                             PossibleCause = COM.PossibleCauses.Impacts,
                                             Stimulus = b.Name,
-                                            TargetObject = m.Name
-                                        },
-                                        new COM.Consecuence
+                                            TargetObject = hb.Name
+                                        }, new COM.Consecuence
                                         {
                                             PossibleConsecuence = COM.PossibleConsecuences.Damages,
                                             Stimulus = b.Name,
-                                            TargetObject = m.Name
+                                            TargetObject = hb.Name
                                         });
-                                }
-                                else{
-                                    soundToPlay("Explosion", 0.7f);
-                                    com.AddEvent(
-                                        new COM.Cause
-                                        {
-                                            PossibleCause = COM.PossibleCauses.Impacts,
-                                            Stimulus = b.Name,
-                                            TargetObject = m.Name
-                                        },
-                                        new COM.Consecuence
-                                        {
-                                            PossibleConsecuence = COM.PossibleConsecuences.Ignores,
-                                            Stimulus = b.Name,
-                                            TargetObject = m.Name
-                                        });
+                                        break;
+                                    }
                                 }
                             }
 
-                if (player.CanCollide && b.Rectangle.Intersects(player.Rectangle))
-                {
-                    b.Explode();
-                    soundToPlay("Explosion", 0.4f);
-                    com.AddEvent(new COM.Cause
+                        foreach (Meteors m in meteors)
+                            if (m.CanCollide)
+                                if (b.Rectangle.Intersects(m.Rectangle))
+                                {
+                                    b.Explode();
+                                    if (!m.IsUndestructible)
+                                    {
+                                        m.Explode();
+                                        soundToPlay("Explosion");
+                                        com.AddEvent(
+                                            new COM.Cause
+                                            {
+                                                PossibleCause = COM.PossibleCauses.Impacts,
+                                                Stimulus = b.Name,
+                                                TargetObject = m.Name
+                                            },
+                                            new COM.Consecuence
+                                            {
+                                                PossibleConsecuence = COM.PossibleConsecuences.Damages,
+                                                Stimulus = b.Name,
+                                                TargetObject = m.Name
+                                            });
+                                    }
+                                    else
+                                    {
+                                        soundToPlay("Explosion", 0.7f);
+                                        com.AddEvent(
+                                            new COM.Cause
+                                            {
+                                                PossibleCause = COM.PossibleCauses.Impacts,
+                                                Stimulus = b.Name,
+                                                TargetObject = m.Name
+                                            },
+                                            new COM.Consecuence
+                                            {
+                                                PossibleConsecuence = COM.PossibleConsecuences.Ignores,
+                                                Stimulus = b.Name,
+                                                TargetObject = m.Name
+                                            });
+                                    }
+                                }
+
+                        if (player.CanCollide && b.Rectangle.Intersects(player.Rectangle))
+                        {
+                            b.Explode();
+                            soundToPlay("Explosion", 0.4f);
+                            com.AddEvent(new COM.Cause
+                            {
+                                PossibleCause = COM.PossibleCauses.Impacts,
+                                Stimulus = b.Name,
+                                TargetObject = player.Name
+                            }, new COM.Consecuence
+                            {
+                                PossibleConsecuence = player.KillPlayer() ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
+                                Stimulus = b.Name,
+                                TargetObject = player.Name
+                            });
+
+                            
+                        }
+                    }
+
+
+                    foreach (Meteors m in meteors)
                     {
-                        PossibleCause = COM.PossibleCauses.Impacts,
-                        Stimulus = b.Name,
-                        TargetObject = player.Name
-                    }, new COM.Consecuence
+                        if (!m.CanCollide)
+                            continue;
+
+                        if (m.Rectangle.Intersects(comFireRange))
+                            comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).", m.Name))
+                                            | comShouldShoot;
+                        query = new PlQuery(String.Format("mover({0}, Veredicto).", m.Name));
+                        objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
+                        query.Dispose();
+
+                        if (m.Rectangle.Intersects(comRange))
+                        {
+                            actions.Add(new Tuple<Rectangle, string>(m.Rectangle, objectVeredict));
+                        }
+
+                        if (player.CanCollide && m.Rectangle.Intersects(player.Rectangle))
+                        {
+                            bool kill_able = player.KillPlayer();
+                            if (kill_able)
+                                soundToPlay("Explosion", 0.9f);
+                            com.AddEvent(
+                                new COM.Cause
+                                {
+                                    PossibleCause = COM.PossibleCauses.Impacts,
+                                    Stimulus = m.Name,
+                                    TargetObject = player.Name
+                                },
+                                new COM.Consecuence
+                                {
+                                    PossibleConsecuence = kill_able ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
+                                    Stimulus = m.Name,
+                                    TargetObject = player.Name
+                                }
+                                );
+                            m.Explode();
+                        }
+
+                        if (com.CanCollide && m.Rectangle.Intersects(com.Rectangle))
+                        {
+                            bool kill_able = com.KillPlayer();
+                            if (kill_able)
+                                soundToPlay("Explosion", 0.9f, 1.0f);
+
+                            com.AddEvent(
+                                new COM.Cause
+                                {
+                                    PossibleCause = COM.PossibleCauses.Impacts,
+                                    Stimulus = m.Name,
+                                    TargetObject = com.Name
+                                },
+                                new COM.Consecuence
+                                {
+                                    PossibleConsecuence = kill_able ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
+                                    Stimulus = m.Name,
+                                    TargetObject = com.Name
+                                }
+                                );
+                            m.Explode();
+                        }
+
+                    }
+
+                    if (player.CanCollide && player.Rectangle.Intersects(comFireRange))
+                        comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).", player.Name)) | comShouldShoot;
+
+                    if (player.CanCollide && powerUpGenerator.PowerUp.IsActive && player.Rectangle.Intersects(powerUpGenerator.PowerUp.Rectangle))
                     {
-                        PossibleConsecuence = player.KillPlayer() ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
-                        Stimulus = b.Name,
-                        TargetObject = player.Name
-                    });
-                }
-            }
-
-            
-            foreach (Meteors m in meteors)
-            {
-                if (!m.CanCollide)
-                    continue;
-
-                if(m.Rectangle.Intersects(comFireRange))
-                    comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).", m.Name))
-                                    | comShouldShoot;
-                query = new PlQuery(String.Format("mover({0}, Veredicto).",m.Name));
-                objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
-                query.Dispose();
-
-                if (m.Rectangle.Intersects(comRange))
-                {
-                    actions.Add(new Tuple<Rectangle, string>(m.Rectangle, objectVeredict));
-                }
-
-                if (player.CanCollide && m.Rectangle.Intersects(player.Rectangle)) {
-                    bool kill_able = player.KillPlayer();
-                    if (kill_able) 
-                        soundToPlay("Explosion", 0.9f);
-                    com.AddEvent(
-                        new COM.Cause
+                        com.AddEvent(new COM.Cause
                         {
                             PossibleCause = COM.PossibleCauses.Impacts,
-                            Stimulus = m.Name,
+                            Stimulus = powerUpGenerator.PowerUp.Name,
                             TargetObject = player.Name
                         },
                         new COM.Consecuence
                         {
-                            PossibleConsecuence = kill_able ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
-                            Stimulus = m.Name,
+                            PossibleConsecuence = COM.PossibleConsecuences.Benefits,
+                            Stimulus = powerUpGenerator.PowerUp.Name,
                             TargetObject = player.Name
-                        }
-                        );
-                    m.Explode();
-                }
+                        });
+                        player.PowerUp = powerUpGenerator.PowerUp.Power;
+                        powerUpGenerator.Take();
 
-                if (com.CanCollide && m.Rectangle.Intersects(com.Rectangle)) {
-                    bool kill_able = com.KillPlayer();
-                    if (kill_able)
-                        soundToPlay("Explosion", 0.9f, 1.0f);
-                    com.AddEvent(
-                        new COM.Cause
+                    }
+
+                    if (com.CanCollide && powerUpGenerator.PowerUp.IsActive && com.Rectangle.Intersects(powerUpGenerator.PowerUp.Rectangle))
+                    {
+                        com.AddEvent(new COM.Cause
                         {
                             PossibleCause = COM.PossibleCauses.Impacts,
-                            Stimulus = m.Name,
+                            Stimulus = powerUpGenerator.PowerUp.Name,
                             TargetObject = com.Name
                         },
                         new COM.Consecuence
                         {
-                            PossibleConsecuence = kill_able ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
-                            Stimulus = m.Name,
+                            PossibleConsecuence = COM.PossibleConsecuences.Benefits,
+                            Stimulus = powerUpGenerator.PowerUp.Name,
                             TargetObject = com.Name
-                        }
-                        );
-                    m.Explode();
-                }
-                
-            }
+                        });
+                        com.PowerUp = powerUpGenerator.PowerUp.Power;
+                        powerUpGenerator.Take();
 
-            if(player.CanCollide && player.Rectangle.Intersects(comFireRange))
-                comShouldShoot = PlQuery.PlCall(String.Format("disparar({0}).",player.Name)) | comShouldShoot;
+                    }
 
-            if (player.CanCollide && powerUpGenerator.PowerUp.IsActive && player.Rectangle.Intersects(powerUpGenerator.PowerUp.Rectangle))
-            {
-                com.AddEvent(new COM.Cause
-                {
-                    PossibleCause = COM.PossibleCauses.Impacts,
-                    Stimulus = powerUpGenerator.PowerUp.Name,
-                    TargetObject = player.Name
-                },
-                new COM.Consecuence
-                {
-                    PossibleConsecuence = COM.PossibleConsecuences.Benefits,
-                    Stimulus = powerUpGenerator.PowerUp.Name,
-                    TargetObject = player.Name
-                });
-                player.PowerUp = powerUpGenerator.PowerUp.Power;
-                powerUpGenerator.Take();
-                
-            }
-
-            if (com.CanCollide && powerUpGenerator.PowerUp.IsActive && com.Rectangle.Intersects(powerUpGenerator.PowerUp.Rectangle))
-            {
-                com.AddEvent(new COM.Cause
-                {
-                    PossibleCause = COM.PossibleCauses.Impacts,
-                    Stimulus = powerUpGenerator.PowerUp.Name,
-                    TargetObject = com.Name
-                },
-                new COM.Consecuence
-                {
-                    PossibleConsecuence = COM.PossibleConsecuences.Benefits,
-                    Stimulus = powerUpGenerator.PowerUp.Name,
-                    TargetObject = com.Name
-                });
-                com.PowerUp = powerUpGenerator.PowerUp.Power;
-                powerUpGenerator.Take();
+                    if (powerUpGenerator.PowerUp.IsActive)
+                    { //&& powerUpGenerator.PowerUp.Rectangle.Intersects(com.ActionRange(2))
+                        query = new PlQuery(String.Format("mover({0}, Veredicto).", powerUpGenerator.PowerUp.Name));
+                        objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
+                        query.Dispose();
+                        actions.Add(new Tuple<Rectangle, string>(powerUpGenerator.PowerUp.Rectangle, objectVeredict));
+                    }
+                    #endregion
+                    // TODO: Add your update logic here
+                    com.Update(gameTime, player.Position, actions);
+                    background.Update(gameTime);
+                    meteorController.Update(gameTime);
+                    player.Update(gameTime);
+                    com.Update(gameTime, player.Position, actions);
+                    powerUpGenerator.Update(gameTime);
+                    if (comShouldShoot)
+                        com.Shoot();
+                    if (com.GameOver)
+                    {
+                        winner = "HUMAN RACE";
+                        state = GameStates.Over;
+                    }
+                    else if (player.GameOver) {
+                        winner = "COMPUTER";
+                        state = GameStates.Over;
+                    }
+                    break;
+                case GameStates.Over:
+                    if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                    {
+                        Console.WriteLine("Dumped..");
+                        MediaPlayer.Stop();
+                        state = GameStates.Running;
+                        LoadContent();
+                    }
+                    break;
 
             }
-
-            if (powerUpGenerator.PowerUp.IsActive )
-            { //&& powerUpGenerator.PowerUp.Rectangle.Intersects(com.ActionRange(2))
-                query = new PlQuery(String.Format("mover({0}, Veredicto).", powerUpGenerator.PowerUp.Name));
-                objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
-                query.Dispose();
-                actions.Add(new Tuple<Rectangle, string>(powerUpGenerator.PowerUp.Rectangle, objectVeredict));
-            }
-            #endregion
-
-            // TODO: Add your update logic here
-
-            com.Update(gameTime, player.Position, actions);
-            background.Update(gameTime);
-            meteorController.Update(gameTime);
-            player.Update(gameTime);
-            com.Update(gameTime, player.Position,actions);
-            powerUpGenerator.Update(gameTime);
-            if (comShouldShoot)
-                com.Shoot();
 
             base.Update(gameTime);
         }
@@ -427,15 +469,24 @@ namespace My_Smart_Spaceship
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
             spriteBatch.Begin();
-            background.Draw(gameTime,spriteBatch);
+            switch (state) {
+                case GameStates.Running:
+                    background.Draw(gameTime, spriteBatch);
+                    //DrawColor(Color.Blue, com.FireRange());
+                    meteorController.Draw(spriteBatch);
+                    powerUpGenerator.Draw(spriteBatch);
+                    player.Draw(spriteBatch);
+                    com.Draw(spriteBatch);
+                    break;
+                case GameStates.Over:
+                    GraphicsDevice.Clear(Color.FromNonPremultiplied(44, 62, 80,255));
+                    string final = "THE WINNER IS " + winner.ToUpper();
+                    Vector2 pos = new Vector2(ScreenWidth / 2, ScreenHeight / 2) - font.MeasureString(final)/2;
+                    spriteBatch.DrawString(font, final, pos, Color.White);
+                    break;
 
-            //DrawColor(Color.Blue, com.FireRange());
-            meteorController.Draw(spriteBatch);
-            powerUpGenerator.Draw(spriteBatch);
-            player.Draw(spriteBatch);
-            com.Draw(spriteBatch);
+            }
             
             spriteBatch.End();
             // TODO: Add your drawing code here
@@ -446,11 +497,12 @@ namespace My_Smart_Spaceship
         protected override void OnExiting(object sender, EventArgs args)
         {
 
-            base.OnExiting(sender, args);
             com.DumpToFile("Content/conocimiento.txt");
             MediaPlayer.Stop();
             Content.Unload();
             Dispose();
+            base.OnExiting(sender, args);
+
         }
 
     }
