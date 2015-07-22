@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -16,9 +17,10 @@ namespace My_Smart_Spaceship
 
     class Bullet
     {
-        private enum BulletStates {
-            Moving,Super,Exploding,Inactive
-        }
+        private enum BulletStates{
+            Moving, Super, Exploding, Inactive
+        };
+
         private BulletStates state = BulletStates.Inactive;
         private Vector2 position;
         private Vector2 velocity;
@@ -64,6 +66,7 @@ namespace My_Smart_Spaceship
 
         public Bullet(SpriteSheetHandler handler,Vector2 velocity,float scale = 1.0f)
         {
+            
             this.velocity = velocity;
             this.scale = scale;
             movingAnimation = handler.AnimatorWithAnimation("BlueBullet_Move");

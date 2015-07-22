@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,8 @@ namespace My_Smart_Spaceship
 
         }
 
-        
+
+        static Dictionary<string, SoundEffectInstance> soundfx;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Background background;
@@ -46,6 +48,7 @@ namespace My_Smart_Spaceship
         Random random = new Random();
         public MainGame()
         {
+            soundfx = new Dictionary<string, SoundEffectInstance>();
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = ScreenHeight;
             graphics.PreferredBackBufferWidth = ScreenWidth;
@@ -84,8 +87,14 @@ namespace My_Smart_Spaceship
             meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",60f,
                 new Vector2(300, 100),new Vector2(100,50), new Point(3, 9), new Point(13, 19));
 
-            if (!PlEngine.IsInitialized)
-            {
+
+            // SOUND FX !!!
+            soundfx.Add("Bullet", Content.Load<SoundEffect>("SoundFX/Bullet").CreateInstance());
+            soundfx.Add("SuperBullet", Content.Load<SoundEffect>("SoundFX/SuperBullet").CreateInstance());
+            soundfx.Add("Shield", Content.Load<SoundEffect>("SoundFX/Shield").CreateInstance());
+            soundfx.Add("Explosion", Content.Load<SoundEffect>("SoundFX/Explosion").CreateInstance());
+
+            if (!PlEngine.IsInitialized) {
                 PlEngine.Initialize(new string[] { "-q", "AI.pl" });
             }
             com.LoadFromFile("Content/conocimiento.txt");
@@ -125,8 +134,6 @@ namespace My_Smart_Spaceship
             string objectVeredict = query.SolutionVariables.First()["Veredicto"].ToString();
             query.Dispose();
 
-            
-
             foreach (Bullet b in playerBullets){
                 if (b.CanCollide){
 
@@ -140,8 +147,11 @@ namespace My_Smart_Spaceship
                         if (m.CanCollide){
                             if (b.Rectangle.Intersects(m.Rectangle)){
                                 b.Explode();
-                                if (!m.IsUndestructible)
+                                if (!m.IsUndestructible){
                                     m.Explode();
+                                }
+                                soundfx["Explosion"].Stop(true);
+                                soundfx["Explosion"].Play();
                             }
                         }
                     }

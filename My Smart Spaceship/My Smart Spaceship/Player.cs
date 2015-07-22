@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 
 namespace My_Smart_Spaceship
 {
@@ -28,6 +29,7 @@ namespace My_Smart_Spaceship
         protected SpriteSheetHandler handler;
         protected KeyboardState prevKeyboardState = Keyboard.GetState();
         protected Animator explosionAnimation;
+        private SoundEffect soundEffect;
         protected PlayerStates state = PlayerStates.Alive;
         protected PowerUps powerUp = PowerUps.None;
         protected float animationScale;
