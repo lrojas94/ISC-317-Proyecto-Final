@@ -112,6 +112,11 @@
         <spr name="39" x="25" y="1667" w="88" h="86"/>
         <spr name="40" x="25" y="1754" w="47" h="53"/>
       </dir>
+      <dir name="PowerUps">
+        <spr name="0" x="1061" y="1" w="19" h="30"/>
+        <spr name="2" x="1081" y="1" w="32" h="32"/>
+        <spr name="1" x="1114" y="1" w="30" h="30"/>
+      </dir>
     </dir>
   </definitions>
 </img>

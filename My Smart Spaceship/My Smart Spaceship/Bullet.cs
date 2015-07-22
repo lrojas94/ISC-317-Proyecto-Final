@@ -28,6 +28,20 @@ namespace My_Smart_Spaceship
         private Animator augmentedBullet;
         private float scale;
 
+        protected string name = "disparo";
+
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+            set
+            {
+                name = value;
+            }
+        }
+
         public bool IsActive {
             get{
                 return isActive;

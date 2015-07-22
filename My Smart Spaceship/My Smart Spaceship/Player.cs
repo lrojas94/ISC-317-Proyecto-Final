@@ -15,7 +15,7 @@ namespace My_Smart_Spaceship
         }
 
         public enum PowerUps {
-            Shield,AugmentedBullet,DoubleShot,None
+            AugmentedBullet,Shield,DoubleShot,None
         }
 
         protected string spritePath;
@@ -31,6 +31,26 @@ namespace My_Smart_Spaceship
         protected PlayerStates state = PlayerStates.Alive;
         protected PowerUps powerUp = PowerUps.None;
         protected float animationScale;
+        protected float powerUpTime = 0;
+        protected Random random = new Random();
+
+        protected string name = "humano";
+
+        public string Name {
+            get {
+                return name;
+            }
+            set {
+                name = value;
+            }
+        }
+
+        public Player.PowerUps PowerUp {
+            set {
+                powerUp = value;
+                powerUpTime  = random.Next(2, 5);
+            }
+        }
 
         public float Scale {
             get{
@@ -82,6 +102,7 @@ namespace My_Smart_Spaceship
         public void GenerateBullets(SpriteSheetHandler handler,int count = 100) {
             for (int i = 0; i < count; i++) {
                 Bullet b = new Bullet(handler,shootingVelocity, scale);
+                b.Name = String.Format("disparo({0})", name);
                 inactiveBullets.Push(b);
             }
         }
@@ -89,6 +110,7 @@ namespace My_Smart_Spaceship
         public void KillPlayer() {
             state = PlayerStates.Dead;
         }
+        
 
         protected void shoot() {
             Bullet b, b1;
@@ -144,6 +166,11 @@ namespace My_Smart_Spaceship
                         shoot();
                     if (Keyboard.GetState().IsKeyDown(Keys.X) && !prevKeyboardState.IsKeyDown(Keys.X))
                         shoot();
+                    if (powerUp != PowerUps.None) 
+                        powerUpTime -= delta;
+                    
+                    if (powerUpTime <= 0)
+                        powerUp = PowerUps.None;
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);

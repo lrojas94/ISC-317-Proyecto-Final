@@ -42,6 +42,8 @@ namespace My_Smart_Spaceship
         private float timeToShoot;
         private float timeSinceLastShot = 0;
         private float timeToGoToCenter = 0;
+
+
         //NOTE: Difference betwee timeSinceLastShot and elapsedSinceShot is that
         //time is supposed to shot EVEN if it cannot shot. The reason why is so that the AI can hit something and learn.
 
@@ -50,6 +52,7 @@ namespace My_Smart_Spaceship
 
         public COM(SpriteSheetHandler handler, string spritePath, Vector2 playerSpeed) :
             base(handler,spritePath, playerSpeed) {
+            name = "ia";
             Rectangle sprite = Rectangle;
             random = new Random();
             //position = new Vector2(MainGame.Instance.ScreenWidth / 2,sprite.Height / 2); //Set COM at top.
@@ -227,10 +230,10 @@ namespace My_Smart_Spaceship
         }
 
 
-        public Rectangle ActionRange(){
+        public Rectangle ActionRange(float factor = 1 ){
             Vector2 finalDirection = Vector2.Zero;
             int maxSize = Math.Max(Rectangle.Width, Rectangle.Height);
-            Point fieldSize = new Point(maxSize*4, maxSize*4);
+            Point fieldSize = new Point((int)(maxSize*4*factor), (int)(maxSize*4*factor));
             Point fieldOrigin = new Point((int)position.X - fieldSize.X/2, (int)position.Y - fieldSize.Y/2);
             return new Rectangle(fieldOrigin, fieldSize);
         }
@@ -269,11 +272,9 @@ namespace My_Smart_Spaceship
             }
 
             //moveTo.Normalize();
-
-            
-            if (moveTo == position)
+            Console.WriteLine();
+            if (Vector2.Distance(moveTo, position) < 10f)
                 return;
-
             
             //moveTo *= playerSpeed * delta;
             //position += moveTo;
@@ -288,7 +289,7 @@ namespace My_Smart_Spaceship
             if (moveTo.Y >= screenHeight - Rectangle.Height)
                 moveTo.Y = screenHeight - Rectangle.Height/2;
 
-            
+           // Console.WriteLine(moveTo);
 
             targetPosition = moveTo;
             goingToPoint = true;
@@ -329,17 +330,17 @@ namespace My_Smart_Spaceship
 
         private void goTo(Vector2 target,float delta) {
             float distance = Math.Abs(Vector2.Distance(position, target));
-            if (distance <= 20f && goingToPoint)
+            if (distance <= 10f)
             {
                 goingToPoint = false;
                 goingToStart = true;
                 timeToGoToCenter = 1f / 3f;
             }
-            else if (distance > 20f)
+            else if (distance > 10f)
             {
                 Vector2 direction = target - position;
                 direction.Normalize();
-                position += this.playerSpeed * direction * delta ; 
+                position += this.playerSpeed * direction * delta ;
             }
         }
        
