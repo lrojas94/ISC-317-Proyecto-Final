@@ -68,10 +68,6 @@ namespace My_Smart_Spaceship
             //to be drawn with standard Rectangle so that it draws "In the middle".
             spriteBatch.Draw( spriteSheet, standardRectangle(position,scale), GetRectangle(),Color.White, rotation, origin, effects, 1.0f);
         }
-        
-
-
-
 
     }
 }

@@ -14,6 +14,10 @@ namespace My_Smart_Spaceship
             Alive,Dead
         }
 
+        public enum PowerUps {
+            Shield,AugmentedBullet,DoubleShot,None
+        }
+
         protected string spritePath;
         protected Vector2 position;
         protected Vector2 playerSpeed;
@@ -25,6 +29,7 @@ namespace My_Smart_Spaceship
         protected KeyboardState prevKeyboardState = Keyboard.GetState();
         protected Animator explosionAnimation;
         protected PlayerStates state = PlayerStates.Alive;
+        protected PowerUps powerUp = PowerUps.None;
         protected float animationScale;
 
         public float Scale {
@@ -86,9 +91,29 @@ namespace My_Smart_Spaceship
         }
 
         protected void shoot() {
-            Bullet b = inactiveBullets.Pop();
-            b.StartBullet(position);
-            activeBullets.Add(b);
+            Bullet b, b1;
+            switch (powerUp) {
+                case PowerUps.AugmentedBullet:
+                    b = inactiveBullets.Pop();
+                    b.StartBullet(position, true);
+                    activeBullets.Add(b);
+                    break;
+                case PowerUps.DoubleShot:
+                    b = inactiveBullets.Pop();
+                    b1 = inactiveBullets.Pop();
+                    b.StartBullet(position + new Vector2(Rectangle.Width/2, 0));
+                    b1.StartBullet(position - new Vector2(Rectangle.Width/2, 0));
+                    activeBullets.Add(b);
+                    activeBullets.Add(b1);
+                    break;
+                default:
+                    b = inactiveBullets.Pop();
+                    b.StartBullet(position);
+                    activeBullets.Add(b);
+                    break;
+
+            }
+            
         }
 
         public void Update(GameTime gameTime) {
@@ -117,7 +142,8 @@ namespace My_Smart_Spaceship
                     // If alive can shoot
                     if (Keyboard.GetState().IsKeyDown(Keys.Space) && !prevKeyboardState.IsKeyDown(Keys.Space))
                         shoot();
-
+                    if (Keyboard.GetState().IsKeyDown(Keys.X) && !prevKeyboardState.IsKeyDown(Keys.X))
+                        shoot();
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);

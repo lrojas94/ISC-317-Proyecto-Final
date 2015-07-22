@@ -17,7 +17,7 @@ namespace My_Smart_Spaceship
     class Bullet
     {
         private enum BulletStates {
-            Moving,Exploding,Inactive
+            Moving,Super,Exploding,Inactive
         }
         private BulletStates state = BulletStates.Inactive;
         private Vector2 position;
@@ -25,6 +25,7 @@ namespace My_Smart_Spaceship
         private bool isActive = false;
         private Animator movingAnimation;
         private Animator explodeAnimation;
+        private Animator augmentedBullet;
         private float scale;
 
         public bool IsActive {
@@ -45,6 +46,8 @@ namespace My_Smart_Spaceship
                 {
                     case BulletStates.Moving:
                         return movingAnimation.CurrentFrameRectangle(position, scale);
+                    case BulletStates.Super:
+                        return augmentedBullet.CurrentFrameRectangle(position, scale);
                     case BulletStates.Exploding:
                         return explodeAnimation.CurrentFrameRectangle(position, scale);
                     default:
@@ -55,7 +58,7 @@ namespace My_Smart_Spaceship
         
         public bool CanCollide {
             get {
-                return state == BulletStates.Moving;
+                return (state == BulletStates.Moving || state == BulletStates.Super);
             }
         }
 
@@ -65,6 +68,7 @@ namespace My_Smart_Spaceship
             this.scale = scale;
             movingAnimation = handler.AnimatorWithAnimation("BlueBullet_Move");
             explodeAnimation = handler.AnimatorWithAnimation("BlueBullet_Explode",false);
+            augmentedBullet = handler.AnimatorWithAnimation("Effect_Shield");
         }
 
         public void ChangeAnimations(SpriteSheetHandler handler,string movingAnimationName = null, string explodeAnimationName = null) {
@@ -74,10 +78,14 @@ namespace My_Smart_Spaceship
                 explodeAnimation = handler.AnimatorWithAnimation(explodeAnimationName,false);
         }
 
-        public void StartBullet(Vector2 position) {
+        public void StartBullet(Vector2 position,bool superBullet = false) {
             this.position = position;
             isActive = true;
-            state = BulletStates.Moving;
+            if (superBullet)
+                state = BulletStates.Super;
+            else
+                state = BulletStates.Moving;
+            augmentedBullet.Reset();
             movingAnimation.Reset();
             explodeAnimation.Reset();
         }
@@ -91,10 +99,22 @@ namespace My_Smart_Spaceship
             if (isActive) {
                 switch (state)
                 {
+                    case BulletStates.Super:
                     case BulletStates.Moving:
                         position += velocity * delta;
-                        movingAnimation.Update(gameTime);
-                        Rectangle positionRectangle = movingAnimation.CurrentFrameRectangle(position,scale);
+
+                        Rectangle positionRectangle;
+                        if (state == BulletStates.Moving)
+                        {
+                            movingAnimation.Update(gameTime);
+                            positionRectangle = movingAnimation.CurrentFrameRectangle(position, scale);
+                        }
+                        else
+                        {
+                            augmentedBullet.Update(gameTime);
+                            positionRectangle = movingAnimation.CurrentFrameRectangle(position, scale);
+                        }
+
                         if (positionRectangle.OutOfGameBounds())
                             state = BulletStates.Inactive;
                         break;
@@ -117,6 +137,9 @@ namespace My_Smart_Spaceship
                 {
                     case BulletStates.Moving:
                         movingAnimation.Draw(spriteBatch, position,scale);
+                        break;
+                    case BulletStates.Super:
+                        augmentedBullet.Draw(spriteBatch, position, scale);
                         break;
                     case BulletStates.Exploding:
                         explodeAnimation.Draw(spriteBatch, position,scale);

@@ -41,6 +41,7 @@ namespace My_Smart_Spaceship
         private float elapsedSinceShot = 0;
         private float timeToShoot;
         private float timeSinceLastShot = 0;
+        private float timeToGoToCenter = 0;
         //NOTE: Difference betwee timeSinceLastShot and elapsedSinceShot is that
         //time is supposed to shot EVEN if it cannot shot. The reason why is so that the AI can hit something and learn.
 
@@ -77,14 +78,19 @@ namespace My_Smart_Spaceship
             float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
             elapsedSinceShot += delta;
             timeSinceLastShot += delta;
+
             switch (state) {
                 case PlayerStates.Alive:
                     move(gameTime, actions);
                     if (goingToPoint)
                         goTo(targetPosition, delta);
-                       
+
                     else
-                        goTo(originalPos, delta);
+                    {
+                        timeToGoToCenter -= delta;
+                        if(timeToGoToCenter <= 0)
+                            goTo(originalPos, delta);
+                    }
                     if (timeSinceLastShot >= random.Next(3,7))
                     {
                         shoot();
@@ -118,7 +124,7 @@ namespace My_Smart_Spaceship
         }
 
         public void Shoot() {
-            if (canShoot)
+            if (canShoot && state != PlayerStates.Dead)
             {
                 canShoot = false;
                 elapsedSinceShot = 0;
@@ -246,14 +252,14 @@ namespace My_Smart_Spaceship
 
                 // Console.Out.WriteLine(action.Item2);
                 Vector2 pointFromRectBorder = this.pointFromRectBorder(moveTo, action.Item1);
+                pointFromRectBorder.Y = action.Item1.Y;
                 float distance = Vector2.DistanceSquared(moveTo, pointFromRectBorder);
-                difference = (moveTo - pointFromRectBorder) * 2*screenWidth/distance; //Dividing by distance will farther from the closest one.
-                
+                difference = (moveTo - pointFromRectBorder) * 4 * screenWidth/distance; //Dividing by distance will farther from the closest one.
                 //Console.WriteLine("Actual -> " + moveTo + " Item -> " + action.Item1.Center.ToVector2());
                 if (Math.Abs(difference.Y) < 2.0f)
-                    difference.Y += (random.Next(0, 1) * 2 - 1) * Rectangle.Height;
+                    difference.Y += (random.Next(0, 1) * 2 - 1) * screenHeight/distance;
                 if (Math.Abs(difference.X) < 2.0f)
-                    difference.X += (random.Next(0, 1)* 2 - 1) * Rectangle.Width;
+                    difference.X += (random.Next(0, 1)* 2 - 1) * screenWidth/distance;
               //  Console.WriteLine("Diferencia -> " + difference);
               //  Console.WriteLine("Actual a -> " + moveTo);
                 if (action.Item2 == "alejar")
@@ -267,6 +273,8 @@ namespace My_Smart_Spaceship
             
             if (moveTo == position)
                 return;
+
+            
             //moveTo *= playerSpeed * delta;
             //position += moveTo;
 
@@ -279,6 +287,8 @@ namespace My_Smart_Spaceship
                 moveTo.Y = Rectangle.Height/2;
             if (moveTo.Y >= screenHeight - Rectangle.Height)
                 moveTo.Y = screenHeight - Rectangle.Height/2;
+
+            
 
             targetPosition = moveTo;
             goingToPoint = true;
@@ -323,6 +333,7 @@ namespace My_Smart_Spaceship
             {
                 goingToPoint = false;
                 goingToStart = true;
+                timeToGoToCenter = 1f / 3f;
             }
             else if (distance > 20f)
             {
