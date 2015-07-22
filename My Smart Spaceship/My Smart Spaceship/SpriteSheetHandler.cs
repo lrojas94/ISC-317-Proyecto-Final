@@ -79,7 +79,6 @@ namespace My_Smart_Spaceship
                     animation.Add(data);
                 }
                 animations.Add(name, animation);
-
                 
             }
         }

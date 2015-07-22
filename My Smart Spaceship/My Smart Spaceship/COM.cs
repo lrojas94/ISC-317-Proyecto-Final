@@ -214,7 +214,6 @@ namespace My_Smart_Spaceship
             }
 
             sr.Close();
-            sr.Dispose();
         }
 
         public void DumpToFile(string filePath)
@@ -235,7 +234,6 @@ namespace My_Smart_Spaceship
             sw.Write(buffer);
             sw.Flush();
             sw.Close();
-            sw.Dispose();
         }
 
 

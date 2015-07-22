@@ -37,8 +37,8 @@ namespace My_Smart_Spaceship
         }
 
         Song bgm;
-        List<SoundEffectInstance> activeSounds = new List<SoundEffectInstance>();
-        static Dictionary<string, SoundEffect> soundfx;
+        List<SoundEffectInstance> activeSounds;
+        Dictionary<string, SoundEffect> soundfx;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Background background;
@@ -48,9 +48,9 @@ namespace My_Smart_Spaceship
         MeteorController meteorController;
         PowerUpGenerator powerUpGenerator;
         Random random = new Random();
+
         public MainGame()
         {
-            soundfx = new Dictionary<string, SoundEffect>();
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = ScreenHeight;
             graphics.PreferredBackBufferWidth = ScreenWidth;
@@ -89,7 +89,8 @@ namespace My_Smart_Spaceship
             meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",60f,
                 new Vector2(300, 100),new Vector2(100,50), new Point(0, 9), new Point(10, 19));
             powerUpGenerator = new PowerUpGenerator(SpriteSheetHandler, @"PowerUps/", new Point(0, 3));
-
+            activeSounds = new List<SoundEffectInstance>();
+            soundfx = new Dictionary<string, SoundEffect>();
             // SOUND FX !!!
             bgm = Content.Load<Song>("SoundFX/Background_Music");
             MediaPlayer.Play(bgm);
@@ -109,14 +110,7 @@ namespace My_Smart_Spaceship
         /// UnloadContent will be called once per game and is the place to unload
         /// game-specific content.
         /// </summary>
-        protected override void UnloadContent()
-        {
-            // TODO: Unload any non ContentManager content here
-            MediaPlayer.Stop();
-            bgm.Dispose();
-            foreach (SoundEffect sf in soundfx.Values)
-                sf.Dispose();
-        }
+        
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -144,7 +138,6 @@ namespace My_Smart_Spaceship
             // Dispose all of the inactive audio instances
             for (int i = 0; i < activeSounds.Count; i++){
                 if (activeSounds[i].State == SoundState.Stopped){
-                    activeSounds[i].Dispose();
                     activeSounds.RemoveAt(i);
                 }
             }
@@ -452,8 +445,12 @@ namespace My_Smart_Spaceship
 
         protected override void OnExiting(object sender, EventArgs args)
         {
-            com.DumpToFile("Content/conocimiento.txt");
+
             base.OnExiting(sender, args);
+            com.DumpToFile("Content/conocimiento.txt");
+            MediaPlayer.Stop();
+            Content.Unload();
+            Dispose();
         }
 
     }
