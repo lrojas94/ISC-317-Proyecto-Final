@@ -10,6 +10,11 @@ TODO:
 		[X] Sprites para las naves, disparos, asteroides, explosiones, etc ...
 		[ ] Sprites para las mejoras (power-ups) como escudos, disparo doble ...
 	
+	# Sonido
+		[ ] Efectos de sonido para los disparos
+		[ ] Efectos de sonido para las explosiones
+		[ ] Efectos de sonido para la victoria/derrota
+	
 	# Logica general
 	[X] Aparicion y movimiento de asteroides
 	[ ] Aparicion y movimiento de mejoras (power-ups)
