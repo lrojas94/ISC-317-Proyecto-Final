@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,8 +36,9 @@ namespace My_Smart_Spaceship
 
         }
 
-
-        static Dictionary<string, SoundEffectInstance> soundfx;
+        Song bgm;
+        List<SoundEffectInstance> activeSounds = new List<SoundEffectInstance>();
+        static Dictionary<string, SoundEffect> soundfx;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         Background background;
@@ -48,7 +50,7 @@ namespace My_Smart_Spaceship
         Random random = new Random();
         public MainGame()
         {
-            soundfx = new Dictionary<string, SoundEffectInstance>();
+            soundfx = new Dictionary<string, SoundEffect>();
             graphics = new GraphicsDeviceManager(this);
             graphics.PreferredBackBufferHeight = ScreenHeight;
             graphics.PreferredBackBufferWidth = ScreenWidth;
@@ -88,12 +90,14 @@ namespace My_Smart_Spaceship
                 new Vector2(300, 100),new Vector2(100,50), new Point(0, 9), new Point(10, 19));
             powerUpGenerator = new PowerUpGenerator(SpriteSheetHandler, @"PowerUps/", new Point(0, 3));
 
-
             // SOUND FX !!!
-            soundfx.Add("Bullet", Content.Load<SoundEffect>("SoundFX/Bullet").CreateInstance());
-            soundfx.Add("SuperBullet", Content.Load<SoundEffect>("SoundFX/SuperBullet").CreateInstance());
-            soundfx.Add("Shield", Content.Load<SoundEffect>("SoundFX/Shield").CreateInstance());
-            soundfx.Add("Explosion", Content.Load<SoundEffect>("SoundFX/Explosion").CreateInstance());
+            bgm = Content.Load<Song>("SoundFX/Background_Music");
+            MediaPlayer.Play(bgm);
+            soundfx.Add("Bullet", Content.Load<SoundEffect>("SoundFX/Bullet"));
+            soundfx.Add("SuperBullet", Content.Load<SoundEffect>("SoundFX/SuperBullet"));
+            soundfx.Add("Shield", Content.Load<SoundEffect>("SoundFX/Shield"));
+            soundfx.Add("Explosion", Content.Load<SoundEffect>("SoundFX/Explosion"));
+            
 
             if (!PlEngine.IsInitialized) {
                 PlEngine.Initialize(new string[] { "-q", "AI.pl" });
@@ -108,6 +112,10 @@ namespace My_Smart_Spaceship
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+            MediaPlayer.Stop();
+            bgm.Dispose();
+            foreach (SoundEffect sf in soundfx.Values)
+                sf.Dispose();
         }
 
         /// <summary>
@@ -133,8 +141,13 @@ namespace My_Smart_Spaceship
             bool comShouldShoot = false;
             string objectVeredict;
 
-
-
+            // Dispose all of the inactive audio instances
+            for (int i = 0; i < activeSounds.Count; i++){
+                if (activeSounds[i].State == SoundState.Stopped){
+                    activeSounds[i].Dispose();
+                    activeSounds.RemoveAt(i);
+                }
+            }
 
             foreach (Bullet b in playerBullets){
                 if (b.CanCollide){
@@ -154,23 +167,29 @@ namespace My_Smart_Spaceship
                         if (m.CanCollide){
                             if (b.Rectangle.Intersects(m.Rectangle)){
                                 b.Explode();
-                                if (!m.IsUndestructible){
+                                SoundEffectInstance soundInstance = soundfx["Explosion"].CreateInstance();
+
+                                if (!m.IsUndestructible)
+                                {
                                     m.Explode();
+                                    soundToPlay("Explosion");
                                 }
-                                soundfx["Explosion"].Stop(true);
-                                soundfx["Explosion"].Play();
+                                else
+                                    soundToPlay("Explosion", 0.7f);
                             }
                         }
                     }
                 }
                 if (com.CanCollide && b.Rectangle.Intersects(com.Rectangle))
                 {
+                    bool kill_able = com.KillPlayer();
+                    soundToPlay("Explosion", kill_able ? 1.0f : 0.4f);
                     com.AddEvent(new COM.Cause {
                         PossibleCause = COM.PossibleCauses.Impacts,
                         Stimulus = b.Name,
                         TargetObject = com.Name
                     }, new COM.Consecuence {
-                        PossibleConsecuence = com.KillPlayer() ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
+                        PossibleConsecuence = kill_able ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
                         Stimulus = b.Name,
                         TargetObject = com.Name
                     });
@@ -181,7 +200,6 @@ namespace My_Smart_Spaceship
             foreach (Bullet b in comBullets)
             {
                 if (b.CanCollide)
-
                     foreach (Bullet hb in playerBullets)
                     {
                         if (hb.CanCollide)
@@ -190,6 +208,7 @@ namespace My_Smart_Spaceship
                             {
                                 hb.Explode();
                                 b.Explode();
+                                soundToPlay("Explosion", 0.5f, 1.0f);
                                 com.AddEvent(new COM.Cause
                                 {
                                     PossibleCause = COM.PossibleCauses.Impacts,
@@ -214,6 +233,7 @@ namespace My_Smart_Spaceship
                                 if (!m.IsUndestructible)
                                 {
                                     m.Explode();
+                                    soundToPlay("Explosion");
                                     com.AddEvent(
                                         new COM.Cause
                                         {
@@ -228,7 +248,8 @@ namespace My_Smart_Spaceship
                                             TargetObject = m.Name
                                         });
                                 }
-                                else
+                                else{
+                                    soundToPlay("Explosion", 0.7f);
                                     com.AddEvent(
                                         new COM.Cause
                                         {
@@ -242,12 +263,13 @@ namespace My_Smart_Spaceship
                                             Stimulus = b.Name,
                                             TargetObject = m.Name
                                         });
+                                }
                             }
 
                 if (player.CanCollide && b.Rectangle.Intersects(player.Rectangle))
                 {
                     b.Explode();
-                    
+                    soundToPlay("Explosion", 0.4f);
                     com.AddEvent(new COM.Cause
                     {
                         PossibleCause = COM.PossibleCauses.Impacts,
@@ -281,6 +303,9 @@ namespace My_Smart_Spaceship
                 }
 
                 if (player.CanCollide && m.Rectangle.Intersects(player.Rectangle)) {
+                    bool kill_able = player.KillPlayer();
+                    if (kill_able) 
+                        soundToPlay("Explosion", 0.9f);
                     com.AddEvent(
                         new COM.Cause
                         {
@@ -290,7 +315,7 @@ namespace My_Smart_Spaceship
                         },
                         new COM.Consecuence
                         {
-                            PossibleConsecuence = player.KillPlayer() ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
+                            PossibleConsecuence = kill_able ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
                             Stimulus = m.Name,
                             TargetObject = player.Name
                         }
@@ -299,6 +324,9 @@ namespace My_Smart_Spaceship
                 }
 
                 if (com.CanCollide && m.Rectangle.Intersects(com.Rectangle)) {
+                    bool kill_able = com.KillPlayer();
+                    if (kill_able)
+                        soundToPlay("Explosion", 0.9f, 1.0f);
                     com.AddEvent(
                         new COM.Cause
                         {
@@ -308,7 +336,7 @@ namespace My_Smart_Spaceship
                         },
                         new COM.Consecuence
                         {
-                            PossibleConsecuence = com.KillPlayer() ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
+                            PossibleConsecuence = kill_able ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
                             Stimulus = m.Name,
                             TargetObject = com.Name
                         }
@@ -393,6 +421,14 @@ namespace My_Smart_Spaceship
             Texture2D t = new Texture2D(GraphicsDevice, 1, 1,false,SurfaceFormat.Color);
             t.SetData<Color>(new Color[] { c });
             spriteBatch.Draw(t, r, Color.White);
+        }
+
+        public void soundToPlay(string soundName, float volume = 1.0f, float pitch = 0.0f){
+            SoundEffectInstance sf = soundfx[soundName].CreateInstance();
+            sf.Volume = volume;
+            sf.Pitch = pitch;
+            sf.Play();
+            activeSounds.Add(sf);
         }
 
         protected override void Draw(GameTime gameTime)

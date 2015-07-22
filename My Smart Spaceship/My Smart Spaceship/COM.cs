@@ -48,7 +48,6 @@ namespace My_Smart_Spaceship
         //time is supposed to shot EVEN if it cannot shot. The reason why is so that the AI can hit something and learn.
 
         private bool canShoot = false;
-        Random random;
 
         public COM(SpriteSheetHandler handler, string spritePath, Vector2 playerSpeed) :
             base(handler,spritePath, playerSpeed) {

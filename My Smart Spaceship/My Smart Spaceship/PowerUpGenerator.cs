@@ -42,8 +42,8 @@ namespace My_Smart_Spaceship
                         random.Next(screenHeight / 10, screenHeight - screenHeight / 10));
                     int spriteNumber = random.Next(0, 3);
                     Console.WriteLine(spriteNumber);
-                    Player.PowerUps powerUp = (Player.PowerUps)spriteNumber;
-                    this.powerUp.Start(puPosition, powerUp, basePath + spriteNumber);
+                    Player.PowerUps enumPowerUp = (Player.PowerUps)spriteNumber;
+                    this.powerUp.Start(puPosition, enumPowerUp, basePath + spriteNumber);
 
                 }
             }

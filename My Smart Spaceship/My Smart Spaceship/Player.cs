@@ -29,7 +29,6 @@ namespace My_Smart_Spaceship
         protected SpriteSheetHandler handler;
         protected KeyboardState prevKeyboardState = Keyboard.GetState();
         protected Animator explosionAnimation;
-        private SoundEffect soundEffect;
         protected PlayerStates state = PlayerStates.Alive;
         protected PowerUps powerUp = PowerUps.None;
         protected float animationScale;
@@ -124,6 +123,7 @@ namespace My_Smart_Spaceship
                     b = inactiveBullets.Pop();
                     b.StartBullet(position, true);
                     activeBullets.Add(b);
+                    MainGame.Instance.soundToPlay("SuperBullet", 0.5f);
                     break;
                 case PowerUps.DoubleShot:
                     b = inactiveBullets.Pop();
@@ -132,11 +132,13 @@ namespace My_Smart_Spaceship
                     b1.StartBullet(position - new Vector2(Rectangle.Width/2, 0));
                     activeBullets.Add(b);
                     activeBullets.Add(b1);
+                    MainGame.Instance.soundToPlay("Bullet", 0.6f);
                     break;
                 default:
                     b = inactiveBullets.Pop();
                     b.StartBullet(position);
                     activeBullets.Add(b);
+                    MainGame.Instance.soundToPlay("Bullet", 0.6f);
                     break;
 
             }

@@ -37,3 +37,9 @@
 /processorParam:Quality=Best
 /build:SoundFX/SuperBullet.wav
 
+#begin SoundFX/Background_Music.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:SoundFX/Background_Music.mp3
+
