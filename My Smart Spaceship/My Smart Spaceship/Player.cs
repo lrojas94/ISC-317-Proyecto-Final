@@ -33,12 +33,12 @@ namespace My_Smart_Spaceship
         protected float animationScale;
         protected float powerUpTime = 0;
         protected Random random = new Random();
-
+        protected Animator shieldAnimation;
         protected string name = "humano";
 
         public string Name {
             get {
-                return name;
+                return name + (powerUp != PowerUps.None ? String.Format("({0})", powerUp.ToString().ToLower()) : "") ;
             }
             set {
                 name = value;
@@ -48,7 +48,7 @@ namespace My_Smart_Spaceship
         public Player.PowerUps PowerUp {
             set {
                 powerUp = value;
-                powerUpTime  = random.Next(2, 5);
+                powerUpTime  = random.Next(5, 10);
             }
         }
 
@@ -94,7 +94,7 @@ namespace My_Smart_Spaceship
             Rectangle sprite = handler.SpriteRectangle(spritePath,Vector2.Zero,scale);
             position = new Vector2(MainGame.Instance.ScreenWidth / 2, MainGame.Instance.ScreenHeight - sprite.Height/2);
             explosionAnimation = handler.AnimatorWithAnimation("Explosion",false);
-            
+            shieldAnimation = handler.AnimatorWithAnimation("Effect_Shield", true);
             Vector2 scaleFactor = Rectangle.Size.ToVector2() / explosionAnimation.CurrentFrameRectangle(position).Size.ToVector2();
             animationScale = Math.Min(scaleFactor.X, scaleFactor.Y);
         }
@@ -107,8 +107,11 @@ namespace My_Smart_Spaceship
             }
         }
 
-        public void KillPlayer() {
+        public bool KillPlayer() {
+            if (powerUp == PowerUps.Shield)
+                return false;
             state = PlayerStates.Dead;
+            return true;
         }
         
 
@@ -166,11 +169,14 @@ namespace My_Smart_Spaceship
                         shoot();
                     if (Keyboard.GetState().IsKeyDown(Keys.X) && !prevKeyboardState.IsKeyDown(Keys.X))
                         shoot();
+
+                    //PowerUps:
                     if (powerUp != PowerUps.None) 
                         powerUpTime -= delta;
-                    
                     if (powerUpTime <= 0)
                         powerUp = PowerUps.None;
+                    if (powerUp == PowerUps.Shield)
+                        shieldAnimation.Update(gameTime);
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);
@@ -199,6 +205,8 @@ namespace My_Smart_Spaceship
             switch (state) {
                 case PlayerStates.Alive:
                     handler.DrawSprite(spriteBatch, position, spritePath, scale);
+                    if (powerUp == PowerUps.Shield)
+                        shieldAnimation.Draw(spriteBatch, position);
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Draw(spriteBatch, position, animationScale);

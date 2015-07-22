@@ -81,7 +81,7 @@ namespace My_Smart_Spaceship
             player.GenerateBullets(SpriteSheetHandler);
             com = new COM(this.SpriteSheetHandler, @"Players/playerC_Mix", new Vector2(250, 250));
             com.GenerateBullets(SpriteSheetHandler);
-            meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",120f,
+            meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",60f,
                 new Vector2(300, 100),new Vector2(100,50), new Point(0, 9), new Point(10, 19));
             powerUpGenerator = new PowerUpGenerator(SpriteSheetHandler, @"PowerUps/", new Point(0, 3));
 
@@ -157,11 +157,10 @@ namespace My_Smart_Spaceship
                         Stimulus = b.Name,
                         TargetObject = com.Name
                     }, new COM.Consecuence {
-                        PossibleConsecuence = COM.PossibleConsecuences.Damages,
+                        PossibleConsecuence = com.KillPlayer() ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
                         Stimulus = b.Name,
                         TargetObject = com.Name
                     });
-                    com.KillPlayer();
                 }
                 
             }
@@ -235,7 +234,7 @@ namespace My_Smart_Spaceship
                 if (player.CanCollide && b.Rectangle.Intersects(player.Rectangle))
                 {
                     b.Explode();
-                    player.KillPlayer();
+                    
                     com.AddEvent(new COM.Cause
                     {
                         PossibleCause = COM.PossibleCauses.Impacts,
@@ -243,7 +242,7 @@ namespace My_Smart_Spaceship
                         TargetObject = player.Name
                     }, new COM.Consecuence
                     {
-                        PossibleConsecuence = COM.PossibleConsecuences.Damages,
+                        PossibleConsecuence = player.KillPlayer() ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
                         Stimulus = b.Name,
                         TargetObject = player.Name
                     });
@@ -269,11 +268,24 @@ namespace My_Smart_Spaceship
                 }
 
                 if (player.CanCollide && m.Rectangle.Intersects(player.Rectangle)) {
-                    player.KillPlayer();
+                    com.AddEvent(
+                        new COM.Cause
+                        {
+                            PossibleCause = COM.PossibleCauses.Impacts,
+                            Stimulus = m.Name,
+                            TargetObject = player.Name
+                        },
+                        new COM.Consecuence
+                        {
+                            PossibleConsecuence = player.KillPlayer() ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
+                            Stimulus = m.Name,
+                            TargetObject = player.Name
+                        }
+                        );
+                    m.Explode();
                 }
 
                 if (com.CanCollide && m.Rectangle.Intersects(com.Rectangle)) {
-                    com.KillPlayer();
                     com.AddEvent(
                         new COM.Cause
                         {
@@ -283,11 +295,12 @@ namespace My_Smart_Spaceship
                         },
                         new COM.Consecuence
                         {
-                            PossibleConsecuence = COM.PossibleConsecuences.Damages,
+                            PossibleConsecuence = com.KillPlayer() ? COM.PossibleConsecuences.Damages : COM.PossibleConsecuences.Ignores,
                             Stimulus = m.Name,
                             TargetObject = com.Name
                         }
                         );
+                    m.Explode();
                 }
                 
             }

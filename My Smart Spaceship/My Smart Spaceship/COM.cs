@@ -107,6 +107,14 @@ namespace My_Smart_Spaceship
                         elapsedSinceShot = 0;
                         canShoot = true;
                     }
+
+                    //PowerUps:
+                    if (powerUp != PowerUps.None)
+                        powerUpTime -= delta;
+                    if (powerUpTime <= 0)
+                        powerUp = PowerUps.None;
+                    if (powerUp == PowerUps.Shield)
+                        shieldAnimation.Update(gameTime);
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Update(gameTime);
@@ -145,6 +153,8 @@ namespace My_Smart_Spaceship
             switch (state) {
                 case PlayerStates.Alive:
                     handler.DrawSprite(spriteBatch, position, spritePath,0,scale,SpriteEffects.FlipVertically);
+                    if (powerUp == PowerUps.Shield)
+                        shieldAnimation.Draw(spriteBatch,position);
                     break;
                 case PlayerStates.Dead:
                     explosionAnimation.Draw(spriteBatch, position, scale);

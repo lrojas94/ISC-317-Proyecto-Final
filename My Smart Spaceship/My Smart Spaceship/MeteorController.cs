@@ -92,12 +92,12 @@ namespace My_Smart_Spaceship
             if (shouldBeIndestructible == 0 || undestructibleMeteorFrameRange == null){
                 int frame = random.Next(normalMeteorFrameRange.X, normalMeteorFrameRange.Y + 1);
                 meteor.Start(initialPosition, initialVelocity, false, basePath + frame);
-                meteor.Name = "asteroide_gris";
+                meteor.Name = "asteroide";
             }
             else {
                 int frame = random.Next(undestructibleMeteorFrameRange.X, undestructibleMeteorFrameRange.Y + 1);
                 meteor.Start(initialPosition, initialVelocity, true, basePath + frame);
-                meteor.Name = "asteroide";
+                meteor.Name = "asteroide_gris";
             }
 
             activeMeteors.Add(meteor);

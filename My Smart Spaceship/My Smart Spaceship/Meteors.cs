@@ -97,6 +97,8 @@ namespace My_Smart_Spaceship
         }
 
         public void Explode() {
+            if (isUndestructible)
+                return;
             state = MeteorStates.Exploding;
             Vector2 scale = Rectangle.Size.ToVector2() / explodeAnimation.CurrentFrameRectangle(position).Size.ToVector2();
             explosionScale = Math.Min(scale.X, scale.Y);
