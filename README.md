@@ -8,19 +8,19 @@ TODO:
 	# Graficos
 		[X] Fondo de estrellas en movimiento
 		[X] Sprites para las naves, disparos, asteroides, explosiones, etc ...
-		[ ] Sprites para las mejoras (power-ups) como escudos, disparo doble ...
+		[X] Sprites para las mejoras (power-ups) como escudos, disparo doble ...
 	
 	# Sonido
-		[ ] Efectos de sonido para los disparos
-		[ ] Efectos de sonido para las explosiones
-		[ ] Efectos de sonido para la victoria/derrota
+		[X] Efectos de sonido para los disparos
+		[X] Efectos de sonido para las explosiones
+		[X] Efectos de sonido para la victoria/derrota
 	
 	# Logica general
 	[X] Aparicion y movimiento de asteroides
-	[ ] Aparicion y movimiento de mejoras (power-ups)
+	[X] Aparicion y movimiento de mejoras (power-ups)
 	[X] Manejo de colisiones
 		[X]	Disparos vs (asteroides, naves enemigas)
-	[ ] Manejo del ciclo principal y cambios persistentes
+	[X] Manejo del ciclo principal y cambios persistentes
 		[ ] Reinicio del juego
 		[X] Cierre del juego
 		[X] Guardar muestras del "conocimiento" de la IA (assertions.pl ?)
@@ -39,5 +39,5 @@ TODO:
 		[X] Implementar regla para alcanzar objetos beneficiosos
 	
 	# Documento
-	[ ] Terminar el documento
-	[ ]	Finalizar el proyecto
+	[X] Terminar el documento
+	[X]	Finalizar el proyecto

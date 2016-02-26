@@ -54,6 +54,8 @@ namespace My_Smart_Spaceship
         GameStates state;
         string winner;
         SpriteFont font;
+        bool aiLoaded = false;
+
         public MainGame()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -91,7 +93,7 @@ namespace My_Smart_Spaceship
             player.GenerateBullets(SpriteSheetHandler);
             com = new COM(this.SpriteSheetHandler, @"Players/playerC_Mix", new Vector2(250, 250));
             com.GenerateBullets(SpriteSheetHandler);
-            meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",60f,
+            meteorController = new MeteorController(100, SpriteSheetHandler, @"Meteors/",300f,
                 new Vector2(300, 100),new Vector2(100,50), new Point(0, 9), new Point(10, 19));
             powerUpGenerator = new PowerUpGenerator(SpriteSheetHandler, @"PowerUps/", new Point(0, 3));
             activeSounds = new List<SoundEffectInstance>();
@@ -110,7 +112,11 @@ namespace My_Smart_Spaceship
             if (!PlEngine.IsInitialized) {
                 PlEngine.Initialize(new string[] { "-q", "AI.pl" });
             }
-            com.LoadFromFile("Content/conocimiento.txt");
+            if (!aiLoaded)
+            {
+                com.LoadFromFile("Content/conocimiento.txt");
+                aiLoaded = true;
+            }
         }
 
         /// <summary>
